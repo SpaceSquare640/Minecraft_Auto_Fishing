@@ -47,3 +47,7 @@ All notable changes to the website branch are recorded here.
 - Added a back-to-top button that moves keyboard focus to the top navigation — Navigation
 - Added scroll reveal for cards; content stays visible without JavaScript and under reduced motion — UX
 - Added a shared pixel-icon sprite for step and feature cards — Assets
+
+## 2026-10-08 (License)
+
+- Added `LICENSE` (GPL-3.0) — Repository

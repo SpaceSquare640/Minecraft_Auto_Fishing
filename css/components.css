@@ -1,0 +1,111 @@
+/* ---------- Status badge ---------- */
+/* Adapted from Uiverse.io by elijahgummer (kind-pig-24), MIT */
+.badge {
+  position: relative;
+  padding: 6px 14px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  user-select: none;
+}
+
+.badge__sparkle {
+  width: 25px;
+  height: 25px;
+  position: absolute;
+  top: -12px;
+  right: -2px;
+  transform: rotate(-20deg);
+  filter: blur(0.5px);
+}
+.badge__sparkle::before,
+.badge__sparkle::after { content: ""; position: absolute; }
+.badge__sparkle::before {
+  width: 1px;
+  height: 100%;
+  left: 12px;
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.7), transparent);
+}
+.badge__sparkle::after {
+  width: 100%;
+  height: 1px;
+  top: 12px;
+  background: linear-gradient(to left, transparent, rgba(255, 255, 255, 0.7), transparent);
+}
+.badge:hover .badge__sparkle::before,
+.badge:hover .badge__sparkle::after { animation: badge-sparkle 3s ease-in-out; }
+
+@keyframes badge-sparkle {
+  0%   { transform: rotate(0deg) scale(1); }
+  50%  { transform: rotate(180deg) scale(1.8); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+/* ---------- Primary block button (Minecraft-style) ---------- */
+.btn-block {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 18px;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: #fff;
+  text-decoration: none;
+  background: var(--color-primary);
+  border: var(--border-pixel) solid #1a0b0b;
+  box-shadow: inset -4px -4px 0 var(--color-primary-dark), 0 4px 0 #1a0b0b;
+  transition: transform var(--duration-fast), box-shadow var(--duration-fast);
+}
+.btn-block:hover { filter: brightness(1.08); }
+.btn-block:active {
+  transform: translateY(4px);
+  box-shadow: inset -4px -4px 0 var(--color-primary-dark), 0 0 0 #1a0b0b;
+}
+
+/* ---------- GitHub button ---------- */
+/* Adapted from Uiverse.io by kamehame-ha (kind-otter-31), MIT */
+.btn-github {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 15px;
+  gap: 12px;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+  background-color: #181717;
+  outline: 3px solid #181717;
+  outline-offset: -3px;
+  border-radius: 5px;
+  transition: var(--duration-base);
+}
+.btn-github svg path { fill: #fff; transition: var(--duration-base); }
+/* The original hover turned the text dark, which would vanish on this dark page; show a light outline instead. */
+.btn-github:hover {
+  background-color: transparent;
+  outline-color: var(--color-text);
+}
+/* The button's own outline would otherwise override the global focus ring. */
+.btn-github:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* ---------- Item frame (hero icon) ---------- */
+.item-frame {
+  margin: 0;
+  width: min(100%, 360px);
+  padding: var(--space-2);
+  background: var(--color-frame-bg);
+  border: var(--border-pixel) solid var(--color-wood);
+  box-shadow: 0 0 0 var(--border-pixel) #3b2614, 0 12px 0 rgba(0, 0, 0, 0.35);
+}

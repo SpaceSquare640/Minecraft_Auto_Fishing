@@ -1,0 +1,37 @@
+/* Design tokens: colors sampled from assets/img/icon.jpg */
+:root {
+  --color-bg: #0f1a2e;
+  --color-surface: #1b2a4a;
+  --color-water: #2a4f9e;
+  --color-wood: #7a5230;
+  --color-stone: #6b6f75;
+  --color-primary: #e23b3b;
+  --color-primary-dark: #9e1f1f;
+  --color-accent: #f2c230;
+  --color-text: #f2f4f8;
+  --color-muted: #9aa4b5;
+  --color-frame-bg: #ffffff;
+
+  --font-display: "Press Start 2P", ui-monospace, monospace;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: clamp(1.5rem, 1.1rem + 2vw, 2.5rem);
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2rem;
+  --space-6: 3rem;
+  --space-7: 4.5rem;
+
+  --border-pixel: 4px;
+  --container-max: 1100px;
+  --gutter: 16px;
+
+  --duration-fast: 150ms;
+  --duration-base: 400ms;
+}

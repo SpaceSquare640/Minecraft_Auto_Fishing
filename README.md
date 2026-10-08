@@ -61,8 +61,10 @@ tests/
 scripts/
   check-site.js     i18n keys, file references, anchors, CSP compliance
   build.js          Builds _site/ for Pages: prerenders English text, stamps ?v=<sha> on CSS/JS URLs
+  smoke-test.js     Live checks of the deployed site (deploy / weekly health modes)
 .github/workflows/
-  pages.yml         Test -> build -> deploy to GitHub Pages
+  pages.yml         Test -> build -> deploy -> verify (GitHub Pages)
+  codeql.yml        CodeQL scanning of the site JS and the workflows
 assets/img/
   icon.webp             Project icon, transparent, 720px WebP (~45 KB)
   favicon.ico           Browser tab icon (16 / 32 / 48px)
@@ -107,6 +109,18 @@ set a unique version, e.g. `ASSET_VERSION=abc1234 node scripts/build.js`.
    (no layout shift when JS runs; readable without JS and by crawlers) and appends `?v=<commit>`
    to CSS/JS URLs so a deploy never mixes new HTML with cached old files. Push only.
 3. **Deploy** — publishes `_site/` with `actions/deploy-pages`. Push only, after tests pass.
+4. **Verify** — `scripts/smoke-test.js deploy` waits for the new version on the live site, then checks
+   every page, assets, the CSP tag, the Discord link, and that tests/scripts/README are not published.
+
+Other automation:
+
+| What | Where | When |
+|---|---|---|
+| CodeQL (JavaScript + GitHub Actions) | `codeql.yml` on this branch | every push / PR |
+| Weekly health check (live site, external links, Discord invite) | `.github/workflows/health.yml` on `Source_Code` — runs this branch's `smoke-test.js health` | Mondays 01:17 UTC, or manually |
+| Dependabot (keeps pinned action SHAs current on both branches) | `.github/dependabot.yml` on `Source_Code` | weekly, 7-day cooldown, opens PRs only |
+
+Scheduled workflows and the Dependabot config must live on the default branch (`Source_Code`); GitHub ignores them elsewhere.
 
 Security rules for the workflow:
 

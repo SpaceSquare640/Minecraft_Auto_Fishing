@@ -76,3 +76,9 @@ All notable changes to the website branch are recorded here.
 
 - Added "Join Discord" buttons (hero and Getting started) and a Discord link in the footer of every page; invite https://discord.gg/aaUQVJeCgC (permanent) — Community
 - Discord mark from Simple Icons 16.34.0 (CC0), used unmodified in brand color #5865F2 (white text 4.61:1) — Assets
+
+## 2026-10-08 (CI automation)
+
+- Added a post-deploy **verify** job: `scripts/smoke-test.js` checks the live version, pages, assets, CSP, Discord link and that private files are not published — CI/CD
+- Added CodeQL scanning for the site JavaScript and the GitHub Actions workflows — Security
+- Weekly health check and Dependabot are configured on the `Source_Code` branch (GitHub only runs schedules from the default branch) — CI/CD

@@ -82,6 +82,8 @@ jobs:
     concurrency:
       group: pages-deploy
       cancel-in-progress: false
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -89,3 +91,23 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+
+  verify:
+    name: Verify live site
+    needs: deploy
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15 # up to 12 x 20 s waiting for the CDN plus ~20 checks x 10 s
+    permissions:
+      contents: read # check out the repository to run scripts/smoke-test.js
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Smoke test the deployed site (version, pages, assets, nothing private published)
+        env:
+          SITE_URL: ${{ needs.deploy.outputs.page_url }}
+          EXPECTED_VERSION: ${{ github.sha }}
+        run: node scripts/smoke-test.js deploy

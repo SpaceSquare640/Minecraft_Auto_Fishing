@@ -4,6 +4,15 @@ Minecraft Auto Fishing is an open-source tool that will automate the repetitive 
 
 > **Status:** In development. Nothing described below is released yet; it describes the planned behavior.
 
+## Supported platforms
+
+| Edition | Platforms |
+|---|---|
+| Minecraft: Java Edition | Windows, macOS, Linux |
+| Minecraft: Bedrock Edition | Windows 10 / 11 |
+
+Consoles (Xbox, PlayStation, Nintendo Switch) and mobile devices (iOS, Android) are not supported. Supported game versions will be listed here at release.
+
 ## How it will work
 
 1. **Cast** — the tool casts the fishing rod.

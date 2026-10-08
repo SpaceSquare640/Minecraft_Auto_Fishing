@@ -95,3 +95,7 @@ All notable changes to the website branch are recorded here.
 ## 2026-10-08 (Change log policy)
 
 - The tool's change log (`Source_Code`) now lists only player-visible changes; repository and CI changes are recorded here — Repository
+
+## 2026-10-08 (Supported platforms)
+
+- Stated the supported editions and platforms on the home page, in the FAQ, the feature cards and the page description: Minecraft: Java Edition (Windows, macOS, Linux) and Bedrock Edition (Windows); consoles and mobile are not supported — Content

@@ -2,16 +2,22 @@
 // Builds the deployable site into _site/ (used by the GitHub Pages workflow).
 //   ASSET_VERSION=<git sha> node scripts/build.js
 // - copies an explicit allowlist only (tests/, scripts/, .github/ and docs are never published)
-// - appends ?v=<version> to local CSS/JS URLs so a deploy never mixes new HTML with cached old JS
+// - prerenders English text into the HTML
+// - content-hashes CSS/JS file names (base.css -> base.3f9a2c1d0e.css) and points the HTML at them, so a
+//   page can only ever load the exact CSS/JS it was built with. GitHub Pages ignores query strings, so
+//   ?v= alone cannot guarantee that. Unhashed copies stay published for pages built before hashing, and
+//   scripts/carry-over.js keeps the previous deploy's hashed files so cached older HTML still works.
 "use strict";
+const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 
 const ROOT = path.resolve(__dirname, "..");
 const OUT = path.join(ROOT, "_site");
-const INCLUDE = ["index.html", "docs.html", "changelog.html", "sitemap.xml", "LICENSE", "css", "js", "locales", "assets"];
-const PAGES = ["index.html", "docs.html", "changelog.html"];
+const INCLUDE = ["index.html", "docs.html", "changelog.html", "404.html", "sitemap.xml", "LICENSE", "css", "js", "locales", "assets"];
+const PAGES = ["index.html", "docs.html", "changelog.html", "404.html"];
+const HASHED_DIRS = ["css", "js", "locales"];
 
 const raw = process.env.ASSET_VERSION || "dev";
 if (!/^(dev|[0-9a-f]{7,40})$/.test(raw)) {
@@ -50,6 +56,20 @@ const lookup = (key) => {
 };
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
+// Content-hash every CSS/JS file: write name.<hash10>.ext next to the original.
+const hashed = {};   // "css/base.css" -> "css/base.3f9a2c1d0e.css"
+for (const dir of HASHED_DIRS) {
+  for (const name of fs.readdirSync(path.join(OUT, dir))) {
+    const m = /^([a-z0-9-]+)\.(css|js)$/.exec(name);
+    if (!m) continue;
+    const content = fs.readFileSync(path.join(OUT, dir, name));
+    const hash = crypto.createHash("sha256").update(content).digest("hex").slice(0, 10);
+    const target = `${m[1]}.${hash}.${m[2]}`;
+    fs.writeFileSync(path.join(OUT, dir, target), content);
+    hashed[`${dir}/${name}`] = `${dir}/${target}`;
+  }
+}
+
 let stamped = 0, filled = 0;
 for (const page of PAGES) {
   const file = path.join(OUT, page);
@@ -67,10 +87,17 @@ for (const page of PAGES) {
   });
   fs.writeFileSync(file, src);
 
-  const html = fs.readFileSync(file, "utf8").replace(
-    /(\s(?:href|src)=")((?:css|js|locales)\/[^"?#]+)"/g,
-    (_, attr, url) => { stamped++; return `${attr}${url}?v=${version}"`; }
-  );
+  const html = fs.readFileSync(file, "utf8")
+    .replace(/(\s(?:href|src)=")((?:\/Minecraft_Auto_Fishing\/)?)((?:css|js|locales)\/[^"?#]+)"/g, (whole, attr, prefix, url) => {
+      if (!hashed[url]) { console.error(`${page}: no hashed file for ${url}`); process.exit(1); }
+      stamped++; return `${attr}${prefix}${hashed[url]}"`;
+    })
+    // marker the post-deploy smoke test waits for
+    .replace('<meta charset="utf-8">', `<meta charset="utf-8">
+  <meta name="build-version" content="${version}">`);
+  // Any reference the rewrite did not catch (?v=, ./ prefix, single quotes, upper case) is a build error.
+  const leftover = /["'\/=](?:\.\/)?(?:css|js|locales)\/[a-z0-9-]+\.(?:css|js)(?=["'?#\s>])/i.exec(html);
+  if (leftover) { console.error(`${page}: unhashed asset reference ${leftover[0]}`); process.exit(1); }
   fs.writeFileSync(file, html);
 }
-console.log(`✔ built _site (version ${version}, ${stamped} asset URLs stamped, ${filled} strings prerendered)`);
+console.log(`✔ built _site (version ${version}, ${Object.keys(hashed).length} files hashed, ${stamped} references rewritten, ${filled} strings prerendered)`);

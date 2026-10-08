@@ -165,6 +165,7 @@
 .site-footer__inner { display: grid; gap: var(--space-4); }
 .site-footer__name { font-family: var(--font-display); font-size: 0.7rem; margin-bottom: var(--space-2); }
 .site-footer__disclaimer, .site-footer__credits { color: var(--color-muted); }
+.site-footer__copy { margin-top: var(--space-2); color: var(--color-muted); font-size: 0.8rem; }
 .site-footer__links { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); margin: 0; padding: 0; list-style: none; }
 .site-footer__links a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; }
 .site-footer__credits a { color: inherit; }

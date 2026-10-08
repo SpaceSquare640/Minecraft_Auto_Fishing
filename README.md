@@ -29,6 +29,7 @@ contain inline `<script>`, `<style>` or `style` attributes (`scripts/check-site.
 | `index.html` | Landing page: hero, interactive fishing demo (manual vs. auto), how it works, features, getting started, FAQ |
 | `docs.html` | Renders `docs/overview.md` from the `Source_Code` branch |
 | `changelog.html` | Renders the tool's `Change Log.md` (`Source_Code`) and this branch's `Change Log.md` |
+| `404.html` | Custom "page not found" page; GitHub Pages serves it for any unknown URL, so it uses absolute `/Minecraft_Auto_Fishing/...` paths |
 
 Docs and changelogs are fetched at runtime from `raw.githubusercontent.com`, so the repository stays the single source of truth. Push the `Source_Code` branch for doc changes to appear (GitHub caches raw files for about 5 minutes).
 
@@ -60,7 +61,8 @@ tests/
   demo-engine.test.js  Demo rules with a fake clock
 scripts/
   check-site.js     i18n keys, file references, anchors, CSP compliance
-  build.js          Builds _site/ for Pages: prerenders English text, stamps ?v=<sha> on CSS/JS URLs
+  build.js          Builds _site/ for Pages: prerenders English text, content-hashes CSS/JS file names
+  carry-over.js     CI only: keeps the previous deploy's hashed CSS/JS so cached older pages still work
   smoke-test.js     Live checks of the deployed site (deploy / weekly health modes)
 .github/workflows/
   pages.yml         Test -> build -> deploy -> verify (GitHub Pages)
@@ -96,8 +98,8 @@ node scripts/check-site.js
 node scripts/build.js        # optional: builds _site/ locally (git-ignored)
 ```
 
-Local builds stamp `?v=dev`, which the browser may cache. When testing CSS/JS changes in `_site/`,
-set a unique version, e.g. `ASSET_VERSION=abc1234 node scripts/build.js`.
+Built pages reference content-hashed CSS/JS (`base.3f9a2c1d0e.css`), so a changed file always gets a new URL
+and browser caches can never serve a stale copy.
 
 ## CI/CD
 
@@ -106,11 +108,14 @@ set a unique version, e.g. `ASSET_VERSION=abc1234 node scripts/build.js`.
 1. **Test** — unit tests and site checks (read-only permission).
 2. **Build** — `scripts/build.js` copies an allowlist of files to `_site/` (tests, scripts and
    `.github/` are never published), writes the English text from `locales/en.js` into the HTML
-   (no layout shift when JS runs; readable without JS and by crawlers) and appends `?v=<commit>`
-   to CSS/JS URLs so a deploy never mixes new HTML with cached old files. Push only.
+   (no layout shift when JS runs; readable without JS and by crawlers) and renames CSS/JS to
+   content-hashed file names. `scripts/carry-over.js` then copies the hashed files that the live
+   pages currently use into `_site/`, so visitors with cached older HTML (Pages caches 10 minutes and
+   ignores query strings) still get matching files. Push only.
 3. **Deploy** — publishes `_site/` with `actions/deploy-pages`. Push only, after tests pass.
-4. **Verify** — `scripts/smoke-test.js deploy` waits for the new version on the live site, then checks
-   every page, assets, the CSP tag, the Discord link, and that tests/scripts/README are not published.
+4. **Verify** — `scripts/smoke-test.js deploy` waits for the new `build-version` on the live site, then checks
+   every page and every hashed CSS/JS it references, assets, the CSP tag, the Discord link, the custom 404
+   page, and that tests/scripts/README are not published.
 
 Other automation:
 

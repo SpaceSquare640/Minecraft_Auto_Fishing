@@ -1,5 +1,6 @@
 /* Design tokens: colors sampled from assets/img/icon.webp */
 :root {
+  color-scheme: dark;   /* dark scrollbars and built-in controls */
   --color-bg: #0f1a2e;
   --color-surface: #1b2a4a;
   --color-water: #2a4f9e;

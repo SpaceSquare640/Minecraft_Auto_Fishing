@@ -14,7 +14,7 @@ const SITE = process.env.SITE_URL || "";
 const EXPECTED_SITE = "https://spacesquare640.github.io/Minecraft_Auto_Fishing/";
 const EXPECTED = (process.env.EXPECTED_VERSION || "").slice(0, 7);
 const PAGES = ["", "docs.html", "changelog.html"];
-const PRIVATE = ["tests/markdown.test.js", "scripts/build.js", "scripts/smoke-test.js", ".github/workflows/pages.yml", "README.md", "Change%20Log.md"];
+const PRIVATE = ["tests/markdown.test.js", "scripts/build.js", "scripts/smoke-test.js", "scripts/carry-over.js", ".github/workflows/pages.yml", "README.md", "Change%20Log.md"];
 const ASSETS = ["sitemap.xml", "assets/img/og-image.png", "assets/img/icon.webp", "assets/fonts/PressStart2P-latin.woff2", "LICENSE"];
 const DISCORD_INVITE = "aaUQVJeCgC";
 const DISCORD_GUILD_ID = "1150040065586770070"; // Player Club; a lapsed code re-claimed by another server must fail
@@ -56,12 +56,21 @@ async function waitForVersion() {
   for (let attempt = 1; attempt <= 12; attempt++) {
     try {
       const { status, text } = await site(`?smoke=${Date.now()}`);
-      if (status === 200 && text.includes(`?v=${EXPECTED}`)) return console.log(`✔ version ${EXPECTED} is live (attempt ${attempt})`);
+      if (status === 200 && text.includes(`name="build-version" content="${EXPECTED}"`)) return console.log(`✔ version ${EXPECTED} is live (attempt ${attempt})`);
       console.log(`… attempt ${attempt}: HTTP ${status}, version not live yet`);
     } catch (e) { console.log(`… attempt ${attempt}: ${e.message}`); }
     await sleep(10000);
   }
   errors.push(`version ${EXPECTED} not live after 12 attempts`);
+}
+
+// Every CSS/JS a page references must be content-hashed and load (relative or /Minecraft_Auto_Fishing/ paths).
+async function checkAssets(label, html) {
+  for (const m of html.matchAll(/\s(?:href|src)="(?:\/Minecraft_Auto_Fishing\/)?((?:css|js|locales)\/[^"]+)"/g)) {
+    if (!/^(?:css|js|locales)\/[a-z0-9-]+\.[0-9a-f]{10}\.(?:css|js)$/.test(m[1])) { errors.push(`${label} → ${m[1]} is not content-hashed`); continue; }
+    const { status } = await site(m[1], { method: "HEAD" });
+    if (status !== 200) errors.push(`${label} → ${m[1]} HTTP ${status}`);
+  }
 }
 
 async function checkPages() {
@@ -71,7 +80,16 @@ async function checkPages() {
     if (!/<meta http-equiv="Content-Security-Policy"/.test(text)) errors.push(`/${page}: CSP meta missing`);
     if (!text.includes(`discord.gg/${DISCORD_INVITE}`)) errors.push(`/${page}: Discord link missing`);
     if (/<h1[^>]*>\s*<\/h1>/.test(text)) errors.push(`/${page}: empty <h1> (text not prerendered)`);
-    if (MODE === "deploy" && !text.includes(`?v=${EXPECTED}`)) errors.push(`/${page}: not version ${EXPECTED}`);
+    if (MODE === "deploy" && !text.includes(`name="build-version" content="${EXPECTED}"`)) errors.push(`/${page}: not version ${EXPECTED}`);
+    // every CSS/JS the page references must load (content-hashed names from scripts/build.js)
+    await checkAssets(`/${page}`, text);
+  });
+  // unknown URLs must get the project's own 404 page, also below a sub-path
+  await check("custom 404", async () => {
+    const { status, text } = await site(`missing/deep/page-${Date.now()}`);
+    if (status !== 404) errors.push(`unknown URL → HTTP ${status} (expected 404)`);
+    if (!/name="robots" content="noindex"/.test(text) || !text.includes("discord.gg/")) errors.push("unknown URL does not show the custom 404 page");
+    else await checkAssets("404 page", text);
   });
   for (const asset of ASSETS) await check(`/${asset}`, async () => {
     const { status } = await site(asset, { method: "HEAD" });

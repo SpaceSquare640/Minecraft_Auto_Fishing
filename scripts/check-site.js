@@ -11,7 +11,10 @@ const path = require("path");
 const vm = require("vm");
 
 const ROOT = path.resolve(__dirname, "..");
-const PAGES = ["index.html", "docs.html", "changelog.html"];
+const PAGES = ["index.html", "docs.html", "changelog.html", "404.html"];
+const BASE = "/Minecraft_Auto_Fishing/";
+// must match INCLUDE in scripts/build.js
+const PUBLISHED = ["index.html", "docs.html", "changelog.html", "404.html", "sitemap.xml", "LICENSE", "css", "js", "locales", "assets"];   // absolute paths (used by 404.html) map to the repo root
 const errors = [];
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), "utf8");
 const exists = (rel) => fs.existsSync(path.join(ROOT, rel));
@@ -54,7 +57,11 @@ for (const page of PAGES) {
     const ref = m[1];
     if (/^(https?:|mailto:|data:)/.test(ref)) continue;
     const [filePart, hash] = ref.split("#");
-    const file = filePart.split("?")[0];
+    let file = filePart.split("?")[0];
+    if (file.startsWith(BASE)) file = file.slice(BASE.length) || "./";
+    else if (file.startsWith("/")) { errors.push(`${page}: absolute path outside the site "${ref}"`); continue; }
+    if (file.split("/").includes("..")) { errors.push(`${page}: ".." in reference "${ref}"`); continue; }
+    if (file && file !== "./" && !PUBLISHED.includes(file.split("/")[0])) { errors.push(`${page}: "${ref}" is not published (see build.js INCLUDE)`); continue; }
     const target = file === "" ? page : (file === "./" ? "index.html" : file);
     if (file !== "" && !exists(target)) { errors.push(`${page}: broken reference "${ref}"`); continue; }
     if (hash && ids[target] && !ids[target].has(hash)) errors.push(`${page}: missing anchor "${ref}"`);

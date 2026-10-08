@@ -6,6 +6,7 @@ window.LOCALES.en = {
     title: "Minecraft Auto Fishing",
     docsTitle: "Docs · Minecraft Auto Fishing",
     changelogTitle: "Changelog · Minecraft Auto Fishing",
+    notFoundTitle: "Page not found · Minecraft Auto Fishing",
     description: "An open-source tool in development that will watch for a bite, reel in and recast for you in Minecraft. Runs outside the game, not a mod."
   },
   nav: {
@@ -26,6 +27,11 @@ window.LOCALES.en = {
     lead: "Release history, loaded live from the repository.",
     tool: "Tool releases",
     site: "Website updates"
+  },
+  notFound: {
+    title: "Page not found",
+    text: "This page doesn't exist, or it has moved. Try the home page, the docs, or ask on Discord.",
+    home: "Back to the home page"
   },
   loader: {
     loading: "Loading…",
@@ -75,6 +81,7 @@ window.LOCALES.en = {
     disclaimer: "Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.",
     navLabel: "Footer",
     license: "License: GPL-3.0",
+    copyright: "© 2026 SpaceSquare640 · Licensed under GPL-3.0",
     credits: "UI components adapted from",
     backToTop: "Back to top"
   },

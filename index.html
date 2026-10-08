@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/demo.css">
+  <link rel="stylesheet" href="css/sections.css">
   <script src="locales/en.js" defer></script>
   <script src="js/i18n.js" defer></script>
   <script src="js/main.js" defer></script>
@@ -184,7 +185,93 @@
       </div>
     </section>
 
-    <!-- M3: how it works, features, getting started, FAQ, footer -->
-  </main>
+    <!-- Pixel icon sprite shared by the step and feature cards -->
+    <svg width="0" height="0" class="visually-hidden" aria-hidden="true" focusable="false">
+      <symbol id="ico-cast" viewBox="0 0 16 16"><path fill="#7a5230" d="M13 1h2v2h-2zM11 3h2v2h-2zM9 5h2v2H9zM7 7h2v2H7z"/><path fill="#e8e2c8" d="M6 9h1v3H6z"/><path fill="#e23b3b" d="M4 12h4v2H4z"/><path fill="#f2f4f8" d="M4 14h4v1H4z"/></symbol>
+      <symbol id="ico-detect" viewBox="0 0 16 16"><path fill="#e23b3b" d="M6 1h4v9H6zM6 12h4v3H6z"/></symbol>
+      <symbol id="ico-reel" viewBox="0 0 16 16"><path fill="#e0623a" d="M3 6h9v5H3zM1 7h2v3H1z"/><path fill="#a8432a" d="M12 5h3v7h-3z"/><path fill="#0f1a2e" d="M4 7h2v2H4z"/></symbol>
+      <symbol id="ico-recast" viewBox="0 0 16 16"><path fill="#f2c230" d="M4 2h8v2H4zM2 4h2v6H2zM12 4h2v2h-2zM12 12H4v2h8zM14 6h-2v6h2zM4 10H2v2h2z"/><path fill="#f2c230" d="M10 0h2v6h-2zM4 10h2v6H4z"/></symbol>
+      <symbol id="ico-gear" viewBox="0 0 16 16"><path fill="#f2c230" d="M6 0h4v3H6zM6 13h4v3H6zM0 6h3v4H0zM13 6h3v4h-3zM3 3h10v10H3z"/><path fill="#1b2a4a" d="M6 6h4v4H6z"/></symbol>
+      <symbol id="ico-window" viewBox="0 0 16 16"><path fill="#9aa4b5" d="M1 2h14v12H1z"/><path fill="#2a4f9e" d="M2 5h12v8H2z"/><path fill="#e23b3b" d="M12 3h2v1h-2z"/><path fill="#5a8f3a" d="M2 11h12v2H2z"/></symbol>
+      <symbol id="ico-github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .3C5.37.3 0 5.67 0 12.3c0 5.3 3.44 9.8 8.2 11.38.6.11.82-.26.82-.58v-2.04c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.62-5.48 5.92.42.36.82 1.1.82 2.22v3.29c0 .32.21.69.82.57A12 12 0 0 0 24 12.3C24 5.67 18.63.3 12 .3z"/></symbol>
+      <symbol id="ico-code" viewBox="0 0 16 16"><path fill="#5a8f3a" d="M4 4h2v2H4zM2 6h2v4H2zM4 10h2v2H4zM10 4h2v2h-2zM12 6h2v4h-2zM10 10h2v2h-2zM7 3h2v10H7z"/></symbol>
+    </svg>
+
+    <section id="how" class="section" aria-labelledby="how-title">
+      <div class="container">
+        <h2 id="how-title" class="section__title" data-i18n="how.title"></h2>
+        <p class="section__lead" data-i18n="how.lead"></p>
+        <ol class="steps">
+          <li class="step reveal"><svg class="step__icon" aria-hidden="true"><use href="#ico-cast"/></svg><h3 class="step__title" data-i18n="how.steps.cast.title"></h3><p data-i18n="how.steps.cast.text"></p></li>
+          <li class="step reveal"><svg class="step__icon" aria-hidden="true"><use href="#ico-detect"/></svg><h3 class="step__title" data-i18n="how.steps.detect.title"></h3><p data-i18n="how.steps.detect.text"></p></li>
+          <li class="step reveal"><svg class="step__icon" aria-hidden="true"><use href="#ico-reel"/></svg><h3 class="step__title" data-i18n="how.steps.reel.title"></h3><p data-i18n="how.steps.reel.text"></p></li>
+          <li class="step reveal"><svg class="step__icon" aria-hidden="true"><use href="#ico-recast"/></svg><h3 class="step__title" data-i18n="how.steps.recast.title"></h3><p data-i18n="how.steps.recast.text"></p></li>
+        </ol>
+        <p class="section__more"><a href="docs.html" data-i18n="how.more"></a></p>
+      </div>
+    </section>
+
+    <section id="features" class="section" aria-labelledby="features-title">
+      <div class="container">
+        <h2 id="features-title" class="section__title" data-i18n="features.title"></h2>
+        <!-- Card adapted from Uiverse.io by Yaya12085 (grumpy-fox-39), MIT -->
+        <ul class="cards">
+          <li class="card reveal"><span class="card__icon"><svg aria-hidden="true"><use href="#ico-gear"/></svg></span><span class="tag tag--planned" data-i18n="features.status.planned"></span><h3 class="card__title" data-i18n="features.items.reel.title"></h3><p class="card__text" data-i18n="features.items.reel.text"></p></li>
+          <li class="card reveal"><span class="card__icon"><svg aria-hidden="true"><use href="#ico-recast"/></svg></span><span class="tag tag--planned" data-i18n="features.status.planned"></span><h3 class="card__title" data-i18n="features.items.recast.title"></h3><p class="card__text" data-i18n="features.items.recast.text"></p></li>
+          <li class="card reveal"><span class="card__icon"><svg aria-hidden="true"><use href="#ico-window"/></svg></span><span class="tag tag--planned" data-i18n="features.status.planned"></span><h3 class="card__title" data-i18n="features.items.outside.title"></h3><p class="card__text" data-i18n="features.items.outside.text"></p></li>
+          <li class="card reveal"><span class="card__icon"><svg aria-hidden="true"><use href="#ico-code"/></svg></span><span class="tag tag--available" data-i18n="features.status.available"></span><h3 class="card__title" data-i18n="features.items.open.title"></h3><p class="card__text" data-i18n="features.items.open.text"></p></li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="start" class="section" aria-labelledby="start-title">
+      <div class="container start">
+        <h2 id="start-title" class="section__title" data-i18n="start.title"></h2>
+        <p class="section__lead" data-i18n="start.text"></p>
+        <a class="btn-github start__cta" href="https://github.com/SpaceSquare640/Minecraft_Auto_Fishing" target="_blank" rel="noopener noreferrer">
+          <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#ico-github"/></svg>
+          <span data-i18n="start.cta"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span>
+        </a>
+      </div>
+    </section>
+
+    <section id="faq" class="section" aria-labelledby="faq-title">
+      <div class="container">
+        <h2 id="faq-title" class="section__title" data-i18n="faq.title"></h2>
+        <div class="faq">
+          <details class="faq__item"><summary data-i18n="faq.items.mod.q"></summary><p data-i18n="faq.items.mod.a"></p></details>
+          <details class="faq__item"><summary data-i18n="faq.items.servers.q"></summary><p data-i18n="faq.items.servers.a"></p></details>
+          <details class="faq__item"><summary data-i18n="faq.items.official.q"></summary><p data-i18n="faq.items.official.a"></p></details>
+          <details class="faq__item"><summary data-i18n="faq.items.release.q"></summary><p data-i18n="faq.items.release.a"></p></details>
+          <details class="faq__item"><summary data-i18n="faq.items.versions.q"></summary><p data-i18n="faq.items.versions.a"></p></details>
+          <details class="faq__item"><summary data-i18n="faq.items.free.q"></summary><p data-i18n="faq.items.free.a"></p></details>
+        </div>
+      </div>
+    </section>
+  </main>  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <div class="site-footer__about">
+        <p class="site-footer__name" data-i18n="footer.name"></p>
+        <p class="site-footer__disclaimer" data-i18n="footer.disclaimer"></p>
+      </div>
+      <nav data-i18n-attr="aria-label:footer.navLabel">
+        <ul class="site-footer__links">
+          <li><a href="docs.html" data-i18n="nav.docs"></a></li>
+          <li><a href="changelog.html" data-i18n="nav.changelog"></a></li>
+          <li><a href="https://github.com/SpaceSquare640/Minecraft_Auto_Fishing" target="_blank" rel="noopener noreferrer"><span data-i18n="nav.github"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span></a></li>
+          <li><a href="https://github.com/SpaceSquare640/Minecraft_Auto_Fishing/blob/Source_Code/LICENSE" target="_blank" rel="noopener noreferrer"><span data-i18n="footer.license"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span></a></li>
+        </ul>
+      </nav>
+      <p class="site-footer__credits">
+        <span data-i18n="footer.credits"></span>
+        <a href="https://uiverse.io" target="_blank" rel="noopener noreferrer">Uiverse.io</a> (MIT)
+      </p>
+    </div>
+    <!-- Adapted from Uiverse.io by vinodjangid07 (afraid-falcon-17), MIT -->
+    <button class="to-top" type="button" data-to-top data-i18n-attr="aria-label:footer.backToTop">
+      <svg class="to-top__icon" viewBox="0 0 384 512" aria-hidden="true" focusable="false"><path d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"/></svg>
+      <span class="to-top__label" data-i18n="footer.backToTop" aria-hidden="true"></span>
+    </button>
+  </footer>
 </body>
 </html>

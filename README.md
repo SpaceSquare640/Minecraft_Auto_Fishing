@@ -22,7 +22,7 @@ The heading font (*Press Start 2P*) is loaded from Google Fonts.
 
 | Page | Content |
 |---|---|
-| `index.html` | Landing page: hero and the interactive fishing demo (manual vs. auto) |
+| `index.html` | Landing page: hero, interactive fishing demo (manual vs. auto), how it works, features, getting started, FAQ |
 | `docs.html` | Renders `docs/overview.md` from the `Source_Code` branch |
 | `changelog.html` | Renders the tool's `Change Log.md` (`Source_Code`) and this branch's `Change Log.md` |
 
@@ -37,12 +37,13 @@ changelog.html
 css/
   tokens.css        Design tokens (colors, fonts, spacing)
   base.css          Reset, layout, responsive rules, reduced-motion
-  components.css    Badge, buttons, hero icon, site navigation
+  components.css    Badge, buttons, hero icon, site navigation, footer, back-to-top
   prose.css         Typography for rendered Markdown
   demo.css          Demo scene, mode lever, stats, activity log
+  sections.css      How it works, features, getting started, FAQ, scroll reveal
 js/
   i18n.js           Fills data-i18n / data-i18n-attr from window.LOCALES
-  main.js           Page bootstrap
+  main.js           Page bootstrap: i18n, scroll reveal, back-to-top
   markdown.js       Minimal, escape-first Markdown renderer (no raw HTML)
   doc-loader.js     Fetches Markdown from the repo into [data-doc] elements
   demo-engine.js    Demo rules as a DOM-free state machine (timings in CONFIG)
@@ -89,4 +90,9 @@ node --test "tests/*.test.js"
 
 UI components adapted from [Uiverse.io](https://uiverse.io) (MIT):
 `elijahgummer/kind-pig-24` (badge), `kamehame-ha/kind-otter-31` (GitHub button),
-`chase2k25/rare-quail-40` (demo mode lever).
+`chase2k25/rare-quail-40` (demo mode lever), `Yaya12085/grumpy-fox-39` (feature cards),
+`vinodjangid07/afraid-falcon-17` (back-to-top button).
+
+## License
+
+GPL-3.0. See `LICENSE`.

@@ -31,6 +31,51 @@ window.LOCALES.en = {
     error: "This document could not be loaded.",
     viewOnGithub: "View it on GitHub"
   },
+  how: {
+    title: "How it works",
+    lead: "Four steps, repeated for as long as you let it run.",
+    more: "Read the full docs →",
+    steps: {
+      cast: { title: "1. Cast", text: "The tool casts your fishing rod." },
+      detect: { title: "2. Detect a bite", text: "It watches for the moment a fish bites. Detection method: to be decided." },
+      reel: { title: "3. Reel in", text: "It reels in right away, before the fish gets away." },
+      recast: { title: "4. Recast", text: "It casts again and keeps going until you stop it." }
+    }
+  },
+  features: {
+    title: "Features",
+    status: { planned: "Planned", available: "Available" },
+    items: {
+      reel: { title: "Auto reel-in", text: "Reels in the moment a fish bites." },
+      recast: { title: "Auto recast", text: "Casts again after every catch, with no input from you." },
+      outside: { title: "Runs outside the game", text: "Not a mod. No game files are changed." },
+      open: { title: "Open source", text: "Free to read, change and share under GPL-3.0." }
+    }
+  },
+  start: {
+    title: "Getting started",
+    text: "Downloads and setup instructions will appear here when the first version is released.",
+    cta: "Follow on GitHub"
+  },
+  faq: {
+    title: "FAQ",
+    items: {
+      mod: { q: "Is it a mod?", a: "No. It runs outside Minecraft and does not change any game files." },
+      servers: { q: "Can I use it on multiplayer servers?", a: "Many servers do not allow automated or AFK fishing. Check the rules of the server you play on first." },
+      official: { q: "Is it made by Mojang or Microsoft?", a: "No. This is an independent fan project and is not affiliated with Mojang or Microsoft." },
+      release: { q: "When will it be released?", a: "There is no release date yet. Progress is posted on the Changelog page." },
+      versions: { q: "Which Minecraft versions will it support?", a: "Not decided yet. Supported versions will be listed in the docs at release." },
+      free: { q: "Is it free?", a: "Yes. It is open source under the GPL-3.0 license." }
+    }
+  },
+  footer: {
+    name: "Minecraft Auto Fishing",
+    disclaimer: "Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.",
+    navLabel: "Footer",
+    license: "License: GPL-3.0",
+    credits: "UI components adapted from",
+    backToTop: "Back to top"
+  },
   a11y: {
     skip: "Skip to content",
     newTab: "(opens in a new tab)"

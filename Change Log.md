@@ -39,3 +39,11 @@ All notable changes to the website branch are recorded here.
 - Screen readers hear the bite and results in Manual mode, and only start / pause in Auto mode — Accessibility
 - `i18n.t()` now fills `{name}` placeholders — i18n
 - Added `tests/demo-engine.test.js` (10 tests with a fake clock) — Tests
+
+## 2026-10-08 (Home sections & footer)
+
+- Added How it works (4 steps), Features (with Planned / Available status), Getting started (coming soon) and FAQ sections to the home page — Home
+- Added a shared footer to all pages: links, GPL-3.0 license link, non-affiliation notice, Uiverse.io credits — Footer
+- Added a back-to-top button that moves keyboard focus to the top navigation — Navigation
+- Added scroll reveal for cards; content stays visible without JavaScript and under reduced motion — UX
+- Added a shared pixel-icon sprite for step and feature cards — Assets

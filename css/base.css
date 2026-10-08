@@ -23,6 +23,11 @@ h1, h2, h3 {
 
 p { margin: 0; }
 
+/* Long single words (e.g. future translations) must wrap instead of being clipped.
+   "anywhere" (unlike "break-word") also lowers min-content, so grid/flex tracks cannot be
+   stretched past the viewport by one long word. */
+body { overflow-wrap: anywhere; }
+
 a { color: inherit; }
 
 :focus-visible {
@@ -63,6 +68,7 @@ a { color: inherit; }
 
 .hero__inner {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);   /* never wider than the container */
   gap: var(--space-6);
   align-items: center;
 }
@@ -108,7 +114,7 @@ a { color: inherit; }
 
 /* Desktop: hero splits into text | art */
 @media (min-width: 1024px) {
-  .hero__inner { grid-template-columns: 1.2fr 1fr; }
+  .hero__inner { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
 }
 
 @media (prefers-reduced-motion: reduce) {

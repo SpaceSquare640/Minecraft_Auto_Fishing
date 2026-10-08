@@ -7,6 +7,7 @@
   --color-stone: #6b6f75;
   --color-primary: #e23b3b;
   --color-primary-dark: #9e1f1f;
+  --color-button: #cc2e2e;      /* darker than primary so white text meets WCAG AA (5.25:1) */
   --color-accent: #f2c230;
   --color-text: #f2f4f8;
   --color-muted: #9aa4b5;

@@ -59,7 +59,7 @@
   line-height: 1.4;
   color: #fff;
   text-decoration: none;
-  background: var(--color-primary);
+  background: var(--color-button);
   border: var(--border-pixel) solid #1a0b0b;
   box-shadow: inset -4px -4px 0 var(--color-primary-dark), 0 4px 0 #1a0b0b;
   transition: transform var(--duration-fast), box-shadow var(--duration-fast);

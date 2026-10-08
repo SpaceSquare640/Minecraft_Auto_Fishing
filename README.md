@@ -60,7 +60,7 @@ tests/
   demo-engine.test.js  Demo rules with a fake clock
 scripts/
   check-site.js     i18n keys, file references, anchors, CSP compliance
-  build.js          Builds _site/ for Pages and stamps ?v=<sha> on CSS/JS URLs
+  build.js          Builds _site/ for Pages: prerenders English text, stamps ?v=<sha> on CSS/JS URLs
 .github/workflows/
   pages.yml         Test -> build -> deploy to GitHub Pages
 assets/img/
@@ -94,14 +94,18 @@ node scripts/check-site.js
 node scripts/build.js        # optional: builds _site/ locally (git-ignored)
 ```
 
+Local builds stamp `?v=dev`, which the browser may cache. When testing CSS/JS changes in `_site/`,
+set a unique version, e.g. `ASSET_VERSION=abc1234 node scripts/build.js`.
+
 ## CI/CD
 
 `.github/workflows/pages.yml` runs on every push and pull request to this branch:
 
 1. **Test** — unit tests and site checks (read-only permission).
 2. **Build** — `scripts/build.js` copies an allowlist of files to `_site/` (tests, scripts and
-   `.github/` are never published) and appends `?v=<commit>` to CSS/JS URLs so a deploy never
-   mixes new HTML with cached old files. Push only.
+   `.github/` are never published), writes the English text from `locales/en.js` into the HTML
+   (no layout shift when JS runs; readable without JS and by crawlers) and appends `?v=<commit>`
+   to CSS/JS URLs so a deploy never mixes new HTML with cached old files. Push only.
 3. **Deploy** — publishes `_site/` with `actions/deploy-pages`. Push only, after tests pass.
 
 Security rules for the workflow:

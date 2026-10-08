@@ -62,3 +62,12 @@ All notable changes to the website branch are recorded here.
 - Added the GitHub Actions workflow `pages.yml`: test, build and deploy to GitHub Pages with least-privilege permissions and SHA-pinned official actions — CI/CD
 - Security review fixes: linear-time heading parsing (was cubic on long whitespace), emphasis can no longer alter link URLs, exact-origin check for same-site links, build refuses symlinks, CSP `connect-src` scoped to this repository, workflow concurrency per branch with a fixed deploy group — Security
 - Added 4 security regression tests (22 tests in total) — Tests
+
+## 2026-10-08 (M4b: quality pass)
+
+- Build now prerenders English text into the deployed HTML; fixes layout shift (CLS up to 0.38 → 0) and makes pages readable without JavaScript — Performance / SEO
+- Docs area reserves space while loading; heading font uses `font-display: optional` with preload, so it never swaps mid-read — Performance
+- Primary button red darkened to `#cc2e2e` (white text 5.25:1, WCAG AA) — Accessibility
+- Activity log: `role="log"` moved from the `<ol>` to a wrapper `<div>` (valid ARIA) — Accessibility
+- Long single words (e.g. future translations) now wrap instead of being clipped; layout grid tracks can no longer exceed the viewport — Layout
+- Lighthouse (mobile and desktop, all pages): Accessibility, Best Practices, SEO 100; 0 failed audits — QA

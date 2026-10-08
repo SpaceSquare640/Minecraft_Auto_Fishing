@@ -57,3 +57,7 @@
 
 .doc-status { color: var(--color-muted); }
 .doc-status--error { color: var(--color-text); }
+
+/* Docs arrive asynchronously: reserve space so the footer starts below the fold and does not jump. */
+.prose[data-doc] { min-height: 70vh; }
+.changelog-site .prose[data-doc] { min-height: 0; }

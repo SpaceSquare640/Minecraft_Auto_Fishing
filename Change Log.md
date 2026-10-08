@@ -10,3 +10,9 @@ All notable changes to the website branch are recorded here.
 - Added i18n layer (`data-i18n`, `data-i18n-attr`) with English locale; text is no longer hard-coded in HTML — i18n
 - Added project icon asset — Assets
 - Updated README with structure, local preview and translation guide — Docs
+
+## 2026-10-08 (icon update)
+
+- Replaced the white-background `icon.jpg` with a transparent `icon.png` (512px); removed the white item-frame card and added an outline-following drop shadow — Hero / Assets
+- Added `favicon.ico` (16 / 32 / 48px) and `apple-touch-icon.png` (180px) — Assets
+- Removed `assets/img/icon.jpg` (still available in git history at `50f64ca`) — Assets

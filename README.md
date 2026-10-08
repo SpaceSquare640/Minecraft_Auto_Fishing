@@ -25,14 +25,16 @@ index.html
 css/
   tokens.css        Design tokens (colors, fonts, spacing)
   base.css          Reset, layout, responsive rules, reduced-motion
-  components.css    Badge, buttons, item frame
+  components.css    Badge, buttons, hero icon
 js/
   i18n.js           Fills data-i18n / data-i18n-attr from window.LOCALES
   main.js           Page bootstrap
 locales/
   en.js             English strings
 assets/img/
-  icon.jpg          Project icon
+  icon.png              Project icon, transparent, 512px
+  favicon.ico           Browser tab icon (16 / 32 / 48px)
+  apple-touch-icon.png  iOS home-screen icon (180px, opaque)
 ```
 
 ## Preview locally

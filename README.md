@@ -27,4 +27,4 @@
 
 ## License
 
-To be decided.
+[GPL-3.0](LICENSE) — you may use, change and share this project; if you distribute a modified version, it must also be open source under GPL-3.0.

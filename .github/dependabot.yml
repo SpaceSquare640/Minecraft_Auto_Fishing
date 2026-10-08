@@ -1,0 +1,31 @@
+# Keeps the SHA-pinned GitHub Actions up to date on both branches.
+# Dependabot opens pull requests; nothing is merged without the maintainer.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: Minecraft_Auto_Fishing_Website_Preview
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7 # let new releases settle before proposing them
+    commit-message:
+      prefix: ci
+    groups:
+      github-actions:
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: Source_Code
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: ci
+    groups:
+      github-actions:
+        patterns: ["*"]

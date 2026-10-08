@@ -1,0 +1,38 @@
+# Weekly health check of the live website. Lives on the default branch because GitHub only runs
+# scheduled and manually dispatched workflows from there; the check script itself is read from the
+# website branch (scripts/smoke-test.js) so there is a single copy.
+#
+# Security rules: see the website branch README "CI/CD" (least privilege, GitHub-owned actions
+# pinned to full SHAs, no credentials persisted, no secrets, no package installs).
+
+name: Weekly health check
+
+on:
+  schedule:
+    - cron: "17 1 * * 1" # Mondays 01:17 UTC (09:17 Taipei)
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: health-check
+  cancel-in-progress: false
+
+jobs:
+  health:
+    name: Live site, links and Discord invite
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read # check out the website branch to run its smoke test
+    steps:
+      - name: Check out the website branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/heads/Minecraft_Auto_Fishing_Website_Preview # never a same-named tag
+          persist-credentials: false
+
+      - name: Health check
+        env:
+          SITE_URL: https://spacesquare640.github.io/Minecraft_Auto_Fishing/
+        run: node scripts/smoke-test.js health

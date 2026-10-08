@@ -32,7 +32,7 @@ js/
 locales/
   en.js             English strings
 assets/img/
-  icon.png              Project icon, transparent, 512px
+  icon.webp             Project icon, transparent, 720px WebP (~45 KB)
   favicon.ico           Browser tab icon (16 / 32 / 48px)
   apple-touch-icon.png  iOS home-screen icon (180px, opaque)
 ```

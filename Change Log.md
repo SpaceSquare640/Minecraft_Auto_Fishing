@@ -16,3 +16,8 @@ All notable changes to the website branch are recorded here.
 - Replaced the white-background `icon.jpg` with a transparent `icon.png` (512px); removed the white item-frame card and added an outline-following drop shadow — Hero / Assets
 - Added `favicon.ico` (16 / 32 / 48px) and `apple-touch-icon.png` (180px) — Assets
 - Removed `assets/img/icon.jpg` (still available in git history at `50f64ca`) — Assets
+
+## 2026-10-08 (WebP)
+
+- Hero icon switched from `icon.png` (512px, 493 KB) to `icon.webp` (720px, quality 85, ~45 KB) — sharper on high-DPI screens and about 91% smaller — Hero / Assets
+- Removed `assets/img/icon.png` (still available in git history at `de36a7e`) — Assets

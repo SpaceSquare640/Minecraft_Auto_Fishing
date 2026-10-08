@@ -81,7 +81,7 @@ All notable changes to the website branch are recorded here.
 
 - Added a post-deploy **verify** job: `scripts/smoke-test.js` checks the live version, pages, assets, CSP, Discord link and that private files are not published — CI/CD
 - Added CodeQL scanning for the site JavaScript and the GitHub Actions workflows — Security
-- Weekly health check and Dependabot are configured on the `Source_Code` branch (GitHub only runs schedules from the default branch) — CI/CD
+- Weekly health check (`Source_Code`: `.github/workflows/health.yml`) and Dependabot for GitHub Actions on both branches (`Source_Code`: `.github/dependabot.yml`); they live on the default branch because GitHub only runs schedules from there — Repository
 - `doc-loader.js` only loads allow-listed branches and builds URLs from that constant list (resolves CodeQL `js/xss-through-dom`); `check-site.js` validates `data-branch` values — Security
 
 ## 2026-10-08 (Site review fixes)
@@ -91,3 +91,7 @@ All notable changes to the website branch are recorded here.
 - Added a copyright line to the footer: © 2026 SpaceSquare640 · Licensed under GPL-3.0 — Legal
 - CSS/JS now use content-hashed file names, and the previous deploy's files are carried over, so a page never loads mismatched files after a deploy (GitHub Pages ignores `?v=` query strings) — Reliability
 - Security review fixes: carried-over files must match the hash in their name and are size-capped while streaming; the build fails on any unhashed CSS/JS reference; `check-site.js` only accepts published paths; the smoke test checks the 404 page's assets; the 404 page allows no network requests (`connect-src 'none'`) — Security
+
+## 2026-10-08 (Change log policy)
+
+- The tool's change log (`Source_Code`) now lists only player-visible changes; repository and CI changes are recorded here — Repository

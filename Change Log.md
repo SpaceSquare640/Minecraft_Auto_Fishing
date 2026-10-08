@@ -51,3 +51,14 @@ All notable changes to the website branch are recorded here.
 ## 2026-10-08 (License)
 
 - Added `LICENSE` (GPL-3.0) — Repository
+
+## 2026-10-08 (M4: security, performance, CI/CD)
+
+- Self-hosted the Press Start 2P font (latin + latin-ext, OFL 1.1); removed Google Fonts requests — Privacy / Performance
+- Added a Content-Security-Policy meta tag and an explicit referrer policy to all pages — Security
+- Added Open Graph / Twitter card tags, a 1200x630 social preview image, canonical URLs and `sitemap.xml` — SEO / Sharing
+- Cards and other hidden-until-scrolled content are always visible when printing — UX
+- Added `scripts/check-site.js` (i18n keys, references, anchors, CSP compliance) and `scripts/build.js` (allowlist build with `?v=<sha>` cache busting) — Tooling
+- Added the GitHub Actions workflow `pages.yml`: test, build and deploy to GitHub Pages with least-privilege permissions and SHA-pinned official actions — CI/CD
+- Security review fixes: linear-time heading parsing (was cubic on long whitespace), emphasis can no longer alter link URLs, exact-origin check for same-site links, build refuses symlinks, CSP `connect-src` scoped to this repository, workflow concurrency per branch with a fixed deploy group — Security
+- Added 4 security regression tests (22 tests in total) — Tests

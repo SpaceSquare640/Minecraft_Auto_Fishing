@@ -68,3 +68,33 @@ test("links to the site itself open in the same tab", () => {
   const out = render("[d](https://site.example/docs.html)", { siteOrigin: "https://site.example" });
   assert.doesNotMatch(out, /target=/);
 });
+
+test("security review: heading parsing stays linear on long whitespace (ReDoS)", () => {
+  const start = process.hrtime.bigint();
+  const out = render("# a" + " ".repeat(50000) + "b");
+  const ms = Number(process.hrtime.bigint() - start) / 1e6;
+  assert.ok(ms < 50, `took ${ms.toFixed(1)} ms`);
+  assert.match(out, /^<h1>a\s+b<\/h1>$/);
+  assert.equal(render("## Title ##"), "<h2>Title</h2>");
+});
+
+test("security review: emphasis never lands inside an href", () => {
+  for (const src of ["[a](http://x/*y) z*", "**a [b](https://x/**) c**", "*[a](https://x/*)*"]) {
+    const out = render(src);
+    for (const m of out.matchAll(/href="([^"]*)"/g)) assert.doesNotMatch(m[1], /<|>/, src);
+  }
+  assert.equal(render("[**bold** label](https://a.com)", { siteOrigin: "https://a.com" }),
+    '<p><a href="https://a.com/"><strong>bold</strong> label</a></p>');
+});
+
+test("security review: same-site check compares the exact origin", () => {
+  const opts = { siteOrigin: "https://spacesquare640.github.io" };
+  for (const u of ["https://spacesquare640.github.io.evil.com/", "https://spacesquare640.github.io@evil.com/"]) {
+    assert.match(render(`[a](${u})`, opts), /target="_blank" rel="noopener noreferrer"/, u);
+  }
+  assert.doesNotMatch(render("[a](https://spacesquare640.github.io/x)", opts), /target=/);
+});
+
+test("security review: deep blockquote nesting fails safely instead of hanging", () => {
+  assert.throws(() => render(">".repeat(20000) + " x"), RangeError);
+});

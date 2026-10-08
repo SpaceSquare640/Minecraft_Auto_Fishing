@@ -210,3 +210,7 @@
 .to-top:is(:hover, :focus-visible) { width: 140px; border-radius: 50px; background: var(--color-accent); }
 .to-top:is(:hover, :focus-visible) .to-top__icon { transform: translateY(-200%); }
 .to-top:is(:hover, :focus-visible) .to-top__label { font-size: 13px; bottom: auto; transition: font-size 0.3s; }
+
+@media print {
+  .to-top, .skip-link { display: none; }
+}

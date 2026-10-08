@@ -1,0 +1,91 @@
+# Test, build and deploy the website to GitHub Pages.
+#
+# Security rules (see README "CI/CD"):
+# - no permissions by default; each job opts into the minimum it needs
+# - only GitHub-owned actions, pinned to full commit SHAs (tag in the trailing comment)
+# - checkout never persists credentials
+# - no pull_request_target, no secrets, no package installs, no untrusted ${{ }} inside run:
+# - deploy only after tests pass, only from this branch, one deploy at a time
+
+name: Website
+
+on:
+  push:
+    branches: [Minecraft_Auto_Fishing_Website_Preview]
+  pull_request:
+    branches: [Minecraft_Auto_Fishing_Website_Preview]
+
+permissions: {}
+
+# One run per branch / PR. Superseded PR runs are cancelled; runs on the website branch never are.
+# (Fork PRs cannot hijack this: external contributors' workflows need maintainer approval to run.)
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    name: Test and check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read # read the repository to check it out
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Show Node.js version
+        run: node --version
+
+      - name: Unit tests
+        run: node --test tests/*.test.js
+
+      - name: Site checks (i18n keys, references, anchors, CSP compliance)
+        run: node scripts/check-site.js
+
+  build:
+    name: Build
+    needs: test
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read # read the repository to check it out
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build _site
+        env:
+          ASSET_VERSION: ${{ github.sha }}
+        run: node scripts/build.js
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _site
+
+  deploy:
+    name: Deploy
+    needs: build
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      pages: write # publish the uploaded artifact to GitHub Pages
+      id-token: write # OIDC token that deploy-pages uses to prove the deployment's origin
+    # Fixed group on the deploy job only: one deploy at a time, never cancelled midway.
+    concurrency:
+      group: pages-deploy
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

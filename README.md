@@ -15,8 +15,12 @@ so players can understand how it works without reading long text documentation.
 
 ## Tech
 
-Plain HTML, CSS and JavaScript. No build step, no dependencies.
-The heading font (*Press Start 2P*) is loaded from Google Fonts.
+Plain HTML, CSS and JavaScript, no dependencies. The heading font (*Press Start 2P*, SIL OFL 1.1)
+is self-hosted, so the site makes no third-party requests except reading docs from GitHub.
+
+A Content-Security-Policy `<meta>` on every page allows only same-origin scripts, styles, images and fonts,
+and network requests only to the site itself and `raw.githubusercontent.com`. Because of this, pages must not
+contain inline `<script>`, `<style>` or `style` attributes (`scripts/check-site.js` enforces it).
 
 ## Pages
 
@@ -41,6 +45,7 @@ css/
   prose.css         Typography for rendered Markdown
   demo.css          Demo scene, mode lever, stats, activity log
   sections.css      How it works, features, getting started, FAQ, scroll reveal
+  fonts.css         @font-face for the self-hosted Press Start 2P
 js/
   i18n.js           Fills data-i18n / data-i18n-attr from window.LOCALES
   main.js           Page bootstrap: i18n, scroll reveal, back-to-top
@@ -53,10 +58,19 @@ locales/
 tests/
   markdown.test.js  Renderer and XSS tests (node --test)
   demo-engine.test.js  Demo rules with a fake clock
+scripts/
+  check-site.js     i18n keys, file references, anchors, CSP compliance
+  build.js          Builds _site/ for Pages and stamps ?v=<sha> on CSS/JS URLs
+.github/workflows/
+  pages.yml         Test -> build -> deploy to GitHub Pages
 assets/img/
   icon.webp             Project icon, transparent, 720px WebP (~45 KB)
   favicon.ico           Browser tab icon (16 / 32 / 48px)
   apple-touch-icon.png  iOS home-screen icon (180px, opaque)
+  og-image.png          1200x630 social preview (Open Graph / Twitter)
+assets/fonts/
+  PressStart2P-*.woff2, OFL.txt
+sitemap.xml
 ```
 
 ## Preview locally
@@ -72,12 +86,32 @@ python -m http.server 8000
 
 Then open http://localhost:8000/Minecraft_Auto_Fishing_Website_Preview/docs.html?source=http://localhost:8000/
 
-## Tests
+## Tests and checks
 
 ```bash
-node --test "tests/*.test.js"
+node --test tests/*.test.js
+node scripts/check-site.js
+node scripts/build.js        # optional: builds _site/ locally (git-ignored)
 ```
 
+## CI/CD
+
+`.github/workflows/pages.yml` runs on every push and pull request to this branch:
+
+1. **Test** — unit tests and site checks (read-only permission).
+2. **Build** — `scripts/build.js` copies an allowlist of files to `_site/` (tests, scripts and
+   `.github/` are never published) and appends `?v=<commit>` to CSS/JS URLs so a deploy never
+   mixes new HTML with cached old files. Push only.
+3. **Deploy** — publishes `_site/` with `actions/deploy-pages`. Push only, after tests pass.
+
+Security rules for the workflow:
+
+- `permissions: {}` by default; each job opts into the minimum it needs.
+- Only GitHub-owned actions, pinned to full commit SHAs (tag in the trailing comment).
+- `persist-credentials: false`; no `pull_request_target`; no secrets; no package installs;
+  no untrusted `${{ }}` expressions inside `run:`.
+- Before changing the workflow, run `actionlint` and `zizmor --persona=pedantic` (both online
+  and `--offline`); all must report zero findings.
 ## Adding a language
 
 1. Copy `locales/en.js` to `locales/<lang>.js` and translate the values

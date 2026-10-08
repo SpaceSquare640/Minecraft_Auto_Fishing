@@ -34,28 +34,37 @@
   }
 
   // `text` is raw (unescaped) source.
+  function sameOrigin(url, origin) {
+    try { return !!origin && new URL(url).origin === origin; } catch (e) { return false; }
+  }
+
+  // Code spans and link URLs are swapped for placeholders before emphasis runs, so a "*" inside
+  // a URL can never turn into <em> markup inside an href. Only the link label gets emphasis.
   function inline(text, opts) {
-    var codes = [];
+    var held = [];
+    function hold(html) { held.push(html); return "\u0000" + (held.length - 1) + "\u0000"; }
     var out = escapeHtml(text).replace(/`([^`]+)`/g, function (_, code) {
-      codes.push("<code>" + code + "</code>");
-      return "\u0000" + (codes.length - 1) + "\u0000";
+      return hold("<code>" + code + "</code>");
     });
+    var labels = [];
     out = out.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (whole, label, href) {
       // href is escaped text: undo the escaping to validate, re-escape for the attribute.
       var url = safeUrl(unescapeHtml(href), opts.linkBase);
       if (!url) return label;
-      var external = /^https?:/.test(url) && !(opts.siteOrigin && url.indexOf(opts.siteOrigin) === 0);
-      return '<a href="' + escapeHtml(url) + '"' +
-        (external ? ' target="_blank" rel="noopener noreferrer"' : "") + ">" + label + "</a>";
+      var external = /^https?:/.test(url) && !sameOrigin(url, opts.siteOrigin);
+      labels.push(label);
+      return hold('<a href="' + escapeHtml(url) + '"' +
+        (external ? ' target="_blank" rel="noopener noreferrer"' : "") + ">") + "\u0001" + (labels.length - 1) + "\u0001" + hold("</a>");
     });
+    out = out.replace(/\u0001(\d+)\u0001/g, function (_, n) { return labels[+n]; });
     out = out.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
       .replace(/(^|[^*])\*([^*\s][^*]*)\*/g, "$1<em>$2</em>");
-    return out.replace(/\u0000(\d+)\u0000/g, function (_, n) { return codes[+n]; });
+    return out.replace(/\u0000(\d+)\u0000/g, function (_, n) { return held[+n]; });
   }
 
   var RE = {
     fence: /^```/,
-    heading: /^(#{1,6})\s+(.*?)\s*#*\s*$/,
+    heading: /^(#{1,6})[ \t]+(.*)$/,   // closing #s are trimmed in code; no backtracking-prone pattern
     hr: /^\s{0,3}([-*_])(\s*\1){2,}\s*$/,
     quote: /^\s{0,3}>\s?/,
     listItem: /^(\s*)([-*+]|\d+[.)])\s+(.*)$/,
@@ -93,7 +102,7 @@
   function render(source, options) {
     var opts = options || {};
     var offset = opts.headingOffset || 0;
-    var lines = String(source).replace(/\u0000/g, "").replace(/\r\n?/g, "\n").split("\n");
+    var lines = String(source).replace(/[\u0000\u0001]/g, "").replace(/\r\n?/g, "\n").split("\n");
     var html = [], i = 0, droppedTitle = false, para = [];
 
     function flushPara() {
@@ -118,7 +127,8 @@
         flushPara(); i++;
         if (opts.dropFirstH1 && !droppedTitle && m[1].length === 1) { droppedTitle = true; continue; }
         var level = Math.min(6, m[1].length + offset);
-        html.push("<h" + level + ">" + inline(m[2], opts) + "</h" + level + ">");
+        var text = m[2].trimEnd().replace(/#+$/, "").trimEnd();
+        html.push("<h" + level + ">" + inline(text, opts) + "</h" + level + ">");
         continue;
       }
 

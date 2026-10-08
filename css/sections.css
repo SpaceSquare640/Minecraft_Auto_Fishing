@@ -80,7 +80,7 @@
 /* ---------- Scroll reveal: only hidden when JS runs (html.js), so no-JS users see everything ---------- */
 .js .reveal { opacity: 0; transform: translateY(12px); transition: opacity 400ms ease-out, transform 400ms ease-out; }
 .js .reveal.is-visible { opacity: 1; transform: none; }
-@media (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce), print {
   .js .reveal { opacity: 1; transform: none; }
 }
 

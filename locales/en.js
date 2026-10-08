@@ -46,6 +46,59 @@ window.LOCALES.en = {
   },
   demo: {
     title: "Interactive demo",
-    placeholder: "Coming soon: a playable simulation of manual vs. automatic fishing."
+    lead: "Fish by hand first: cast, wait for the bobber to dip, and reel in fast. Then flip the lever to Auto and watch the tool do it for you.",
+    disclaimer: "Simulation, not the actual tool. Timings are illustrative.",
+    modeLabel: "Mode",
+    manual: "Manual",
+    auto: "Auto",
+    sceneHint: "Pond scene",
+    action: {
+      cast: "Cast",
+      casting: "Casting…",
+      reel: "Reel in",
+      reelNow: "Reel in!",
+      reeling: "Reeling…",
+      pause: "Pause",
+      resume: "Resume"
+    },
+    result: {
+      intro: "Press Cast, then reel in as soon as the bobber dips.",
+      waiting: "Watch the bobber…",
+      bite: "Bite!",
+      caught: "Caught {fish} in {ms} ms.",
+      missed: "Too slow. The fish got away.",
+      early: "Too early. Nothing on the hook.",
+      autoRunning: "Auto mode is fishing on its own.",
+      autoPaused: "Auto mode paused."
+    },
+    stats: {
+      caption: "Results: manual vs. auto",
+      metric: "Result",
+      caught: "Caught",
+      missed: "Missed",
+      best: "Best reaction",
+      ms: "{ms} ms",
+      none: "—"
+    },
+    log: {
+      label: "Activity log",
+      cast: "Casting…",
+      waiting: "Watching the bobber…",
+      bite: "Bite detected",
+      reeling: "Reeling in ({ms} ms after the bite)",
+      caught: "Caught {fish}",
+      missed: "Missed: too slow",
+      early: "Reeled in too early",
+      paused: "Paused",
+      resumed: "Resumed",
+      modeManual: "Switched to Manual",
+      modeAuto: "Switched to Auto"
+    },
+    fish: {
+      cod: "Raw Cod",
+      salmon: "Raw Salmon",
+      pufferfish: "Pufferfish",
+      tropical: "Tropical Fish"
+    }
   }
 };

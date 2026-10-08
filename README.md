@@ -22,7 +22,7 @@ The heading font (*Press Start 2P*) is loaded from Google Fonts.
 
 | Page | Content |
 |---|---|
-| `index.html` | Landing page (hero, interactive demo) |
+| `index.html` | Landing page: hero and the interactive fishing demo (manual vs. auto) |
 | `docs.html` | Renders `docs/overview.md` from the `Source_Code` branch |
 | `changelog.html` | Renders the tool's `Change Log.md` (`Source_Code`) and this branch's `Change Log.md` |
 
@@ -39,15 +39,19 @@ css/
   base.css          Reset, layout, responsive rules, reduced-motion
   components.css    Badge, buttons, hero icon, site navigation
   prose.css         Typography for rendered Markdown
+  demo.css          Demo scene, mode lever, stats, activity log
 js/
   i18n.js           Fills data-i18n / data-i18n-attr from window.LOCALES
   main.js           Page bootstrap
   markdown.js       Minimal, escape-first Markdown renderer (no raw HTML)
   doc-loader.js     Fetches Markdown from the repo into [data-doc] elements
+  demo-engine.js    Demo rules as a DOM-free state machine (timings in CONFIG)
+  demo.js           Connects the engine to the page; pauses when off screen
 locales/
   en.js             English strings
 tests/
   markdown.test.js  Renderer and XSS tests (node --test)
+  demo-engine.test.js  Demo rules with a fake clock
 assets/img/
   icon.webp             Project icon, transparent, 720px WebP (~45 KB)
   favicon.ico           Browser tab icon (16 / 32 / 48px)
@@ -84,4 +88,5 @@ node --test "tests/*.test.js"
 ## Credits
 
 UI components adapted from [Uiverse.io](https://uiverse.io) (MIT):
-`elijahgummer/kind-pig-24` (badge), `kamehame-ha/kind-otter-31` (GitHub button).
+`elijahgummer/kind-pig-24` (badge), `kamehame-ha/kind-otter-31` (GitHub button),
+`chase2k25/rare-quail-40` (demo mode lever).

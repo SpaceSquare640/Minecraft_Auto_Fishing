@@ -12,7 +12,8 @@
     }, dict);
   }
 
-  function translate(lang, key) {
+  // params fill {name} placeholders, e.g. t("en", "demo.result.caught", { fish: "Raw Cod", ms: 412 }).
+  function translate(lang, key, params) {
     var locales = window.LOCALES || {};
     var value = lookup(locales[lang], key);
     if (value === undefined && lang !== FALLBACK) value = lookup(locales[FALLBACK], key);
@@ -20,7 +21,10 @@
       console.warn("[i18n] missing key:", key);
       return key;
     }
-    return value;
+    if (!params) return value;
+    return String(value).replace(/\{(\w+)\}/g, function (whole, name) {
+      return Object.prototype.hasOwnProperty.call(params, name) ? params[name] : whole;
+    });
   }
 
   function apply(lang, root) {

@@ -30,3 +30,12 @@ All notable changes to the website branch are recorded here.
 - Added `css/prose.css` for rendered documents — CSS
 - Added `tests/markdown.test.js` (8 tests, including XSS cases) — Tests
 - Updated README with pages, local preview of unpushed docs and test command — Docs
+
+## 2026-10-08 (Interactive demo)
+
+- Added the interactive fishing demo: pixel-art pond scene, Manual / Auto mode lever, Cast / Reel in button, manual vs. auto results table and activity log — Demo
+- Manual mode: 1.0 s bite window, reaction time, "too slow" and "too early" outcomes; Auto mode loops on its own with Pause / Resume — Demo
+- Demo pauses when scrolled out of view or when the tab is hidden; reduced-motion users get a static scene that is still playable — Accessibility
+- Screen readers hear the bite and results in Manual mode, and only start / pause in Auto mode — Accessibility
+- `i18n.t()` now fills `{name}` placeholders — i18n
+- Added `tests/demo-engine.test.js` (10 tests with a fake clock) — Tests

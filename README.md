@@ -18,19 +18,36 @@ so players can understand how it works without reading long text documentation.
 Plain HTML, CSS and JavaScript. No build step, no dependencies.
 The heading font (*Press Start 2P*) is loaded from Google Fonts.
 
+## Pages
+
+| Page | Content |
+|---|---|
+| `index.html` | Landing page (hero, interactive demo) |
+| `docs.html` | Renders `docs/overview.md` from the `Source_Code` branch |
+| `changelog.html` | Renders the tool's `Change Log.md` (`Source_Code`) and this branch's `Change Log.md` |
+
+Docs and changelogs are fetched at runtime from `raw.githubusercontent.com`, so the repository stays the single source of truth. Push the `Source_Code` branch for doc changes to appear (GitHub caches raw files for about 5 minutes).
+
 ## Structure
 
 ```text
 index.html
+docs.html
+changelog.html
 css/
   tokens.css        Design tokens (colors, fonts, spacing)
   base.css          Reset, layout, responsive rules, reduced-motion
-  components.css    Badge, buttons, hero icon
+  components.css    Badge, buttons, hero icon, site navigation
+  prose.css         Typography for rendered Markdown
 js/
   i18n.js           Fills data-i18n / data-i18n-attr from window.LOCALES
   main.js           Page bootstrap
+  markdown.js       Minimal, escape-first Markdown renderer (no raw HTML)
+  doc-loader.js     Fetches Markdown from the repo into [data-doc] elements
 locales/
   en.js             English strings
+tests/
+  markdown.test.js  Renderer and XSS tests (node --test)
 assets/img/
   icon.webp             Project icon, transparent, 720px WebP (~45 KB)
   favicon.ico           Browser tab icon (16 / 32 / 48px)
@@ -39,21 +56,28 @@ assets/img/
 
 ## Preview locally
 
-Open `index.html` directly in a browser — no server required.
+`index.html` can be opened directly in a browser. `docs.html` and `changelog.html` fetch Markdown, so serve them over HTTP.
 
-Alternatively, serve the folder:
+To preview **unpushed** docs, serve the parent folder (the folder names match the branch names) and pass `?source=` — this override only works on `localhost` / `127.0.0.1`:
 
 ```bash
+cd ..
 python -m http.server 8000
 ```
 
-Then visit http://localhost:8000.
+Then open http://localhost:8000/Minecraft_Auto_Fishing_Website_Preview/docs.html?source=http://localhost:8000/
+
+## Tests
+
+```bash
+node --test "tests/*.test.js"
+```
 
 ## Adding a language
 
 1. Copy `locales/en.js` to `locales/<lang>.js` and translate the values
    (keep the keys unchanged; set `window.LOCALES["<lang>"]`).
-2. Add `<script src="locales/<lang>.js" defer></script>` to `index.html`
+2. Add `<script src="locales/<lang>.js" defer></script>` to every page (`index.html`, `docs.html`, `changelog.html`)
    before `js/i18n.js`.
 3. Call `I18n.apply("<lang>")`. Missing keys fall back to English.
 

@@ -21,3 +21,12 @@ All notable changes to the website branch are recorded here.
 
 - Hero icon switched from `icon.png` (512px, 493 KB) to `icon.webp` (720px, quality 85, ~45 KB) — sharper on high-DPI screens and about 91% smaller — Hero / Assets
 - Removed `assets/img/icon.png` (still available in git history at `de36a7e`) — Assets
+
+## 2026-10-08 (Docs & Changelog pages)
+
+- Added `docs.html` and `changelog.html`; content is loaded live from the repository's Markdown files — Pages
+- Added site navigation (Home · Docs · Changelog · GitHub) to all pages — Navigation
+- Added `js/markdown.js`, an escape-first Markdown renderer (raw HTML is never rendered; only http/https/mailto links), and `js/doc-loader.js` with loading and error states — JS
+- Added `css/prose.css` for rendered documents — CSS
+- Added `tests/markdown.test.js` (8 tests, including XSS cases) — Tests
+- Updated README with pages, local preview of unpushed docs and test command — Docs

@@ -4,7 +4,32 @@ window.LOCALES = window.LOCALES || {};
 window.LOCALES.en = {
   meta: {
     title: "Minecraft Auto Fishing",
+    docsTitle: "Docs · Minecraft Auto Fishing",
+    changelogTitle: "Changelog · Minecraft Auto Fishing",
     description: "An open-source tool in development that will watch for a bite, reel in and recast for you in Minecraft. Runs outside the game, not a mod."
+  },
+  nav: {
+    label: "Main",
+    brand: "Auto Fishing",
+    home: "Home",
+    docs: "Docs",
+    changelog: "Changelog",
+    github: "GitHub"
+  },
+  docs: {
+    title: "Documentation",
+    lead: "What the tool does, how it will work and what to check before using it. This page is loaded live from the repository."
+  },
+  changelog: {
+    title: "Changelog",
+    lead: "Release history, loaded live from the repository.",
+    tool: "Tool releases",
+    site: "Website updates"
+  },
+  loader: {
+    loading: "Loading…",
+    error: "This document could not be loaded.",
+    viewOnGithub: "View it on GitHub"
   },
   a11y: {
     skip: "Skip to content",

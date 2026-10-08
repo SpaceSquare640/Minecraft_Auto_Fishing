@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n="meta.changelogTitle"></title>
+  <meta name="description" data-i18n-attr="content:meta.description">
+  <meta name="theme-color" content="#0f1a2e">
+  <link rel="icon" href="assets/img/favicon.ico" sizes="16x16 32x32 48x48">
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/prose.css">
+  <script src="locales/en.js" defer></script>
+  <script src="js/i18n.js" defer></script>
+  <script src="js/markdown.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="js/doc-loader.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main" data-i18n="a11y.skip"></a>  <header class="site-header">
+    <nav class="container site-nav" data-i18n-attr="aria-label:nav.label">
+      <a class="site-nav__brand" href="./">
+        <img src="assets/img/icon.webp" width="32" height="32" alt="">
+        <span data-i18n="nav.brand"></span>
+      </a>
+      <ul class="site-nav__links">
+        <li><a href="./" data-i18n="nav.home"></a></li>
+        <li><a href="docs.html" data-i18n="nav.docs"></a></li>
+        <li><a href="changelog.html" aria-current="page" data-i18n="nav.changelog"></a></li>
+        <li><a href="https://github.com/SpaceSquare640/Minecraft_Auto_Fishing" target="_blank" rel="noopener noreferrer"><span data-i18n="nav.github"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span></a></li>
+      </ul>
+    </nav>
+  </header>
+  <main id="main" class="page">
+    <div class="container">
+      <h1 class="page__title" data-i18n="changelog.title"></h1>
+      <p class="page__lead" data-i18n="changelog.lead"></p>
+
+      <section class="page__section" aria-labelledby="changelog-tool">
+        <h2 id="changelog-tool" class="page__subtitle" data-i18n="changelog.tool"></h2>
+        <div class="prose" data-doc data-branch="Source_Code" data-path="Change Log.md" data-drop-title data-heading-offset="1"></div>
+      </section>
+
+      <details class="page__section changelog-site">
+        <summary class="page__subtitle" data-i18n="changelog.site"></summary>
+        <div class="prose" data-doc data-branch="Minecraft_Auto_Fishing_Website_Preview" data-path="Change Log.md" data-drop-title data-heading-offset="1"></div>
+      </details>
+    </div>
+  </main>
+</body>
+</html>

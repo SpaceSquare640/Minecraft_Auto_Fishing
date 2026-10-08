@@ -21,6 +21,20 @@
 <body>
   <a class="skip-link" href="#main" data-i18n="a11y.skip"></a>
 
+  <header class="site-header">
+    <nav class="container site-nav" data-i18n-attr="aria-label:nav.label">
+      <a class="site-nav__brand" href="./">
+        <img src="assets/img/icon.webp" width="32" height="32" alt="">
+        <span data-i18n="nav.brand"></span>
+      </a>
+      <ul class="site-nav__links">
+        <li><a href="./" aria-current="page" data-i18n="nav.home"></a></li>
+        <li><a href="docs.html" data-i18n="nav.docs"></a></li>
+        <li><a href="changelog.html" data-i18n="nav.changelog"></a></li>
+        <li><a href="https://github.com/SpaceSquare640/Minecraft_Auto_Fishing" target="_blank" rel="noopener noreferrer"><span data-i18n="nav.github"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span></a></li>
+      </ul>
+    </nav>
+  </header>
   <main id="main">
     <section class="hero" aria-labelledby="hero-title">
       <div class="container hero__inner">

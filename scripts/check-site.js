@@ -42,6 +42,10 @@ for (const page of PAGES) {
   }
 
   if (!/<meta http-equiv="Content-Security-Policy"/.test(html)) errors.push(`${page}: missing CSP meta tag`);
+  // must match BRANCHES in js/doc-loader.js
+  for (const m of html.matchAll(/data-branch="([^"]*)"/g)) {
+    if (!["Source_Code", "Minecraft_Auto_Fishing_Website_Preview"].includes(m[1])) errors.push(`${page}: unknown data-branch "${m[1]}"`);
+  }
   if (/<script(?![^>]*\ssrc=)[^>]*>/.test(html)) errors.push(`${page}: inline <script> (blocked by CSP)`);
   if (/<style[\s>]/.test(html)) errors.push(`${page}: inline <style> (blocked by CSP)`);
   if (/\sstyle="/.test(html)) errors.push(`${page}: style="" attribute (blocked by CSP)`);

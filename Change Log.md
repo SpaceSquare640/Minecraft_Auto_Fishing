@@ -82,3 +82,4 @@ All notable changes to the website branch are recorded here.
 - Added a post-deploy **verify** job: `scripts/smoke-test.js` checks the live version, pages, assets, CSP, Discord link and that private files are not published — CI/CD
 - Added CodeQL scanning for the site JavaScript and the GitHub Actions workflows — Security
 - Weekly health check and Dependabot are configured on the `Source_Code` branch (GitHub only runs schedules from the default branch) — CI/CD
+- `doc-loader.js` only loads allow-listed branches and builds URLs from that constant list (resolves CodeQL `js/xss-through-dom`); `check-site.js` validates `data-branch` values — Security

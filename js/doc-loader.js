@@ -11,6 +11,9 @@
   var RAW = "https://raw.githubusercontent.com/" + REPO + "/";
   var BLOB = "https://github.com/" + REPO + "/blob/";
   var LOCAL_HOSTS = ["localhost", "127.0.0.1", "[::1]"];
+  // Only these branches can be loaded. The value used in URLs is taken from this constant list,
+  // never from the page attribute itself (CodeQL js/xss-through-dom).
+  var BRANCHES = ["Source_Code", "Minecraft_Auto_Fishing_Website_Preview"];
 
   function sourceBase() {
     var override = new URLSearchParams(location.search).get("source");
@@ -35,7 +38,13 @@
   }
 
   function load(el) {
-    var branch = el.getAttribute("data-branch");
+    var index = BRANCHES.indexOf(el.getAttribute("data-branch"));
+    if (index === -1) {
+      console.warn("[doc-loader] unknown data-branch", el.getAttribute("data-branch"));
+      el.textContent = t("loader.error");
+      return Promise.resolve();
+    }
+    var branch = BRANCHES[index];
     var path = el.getAttribute("data-path");
     var encodedPath = path.split("/").map(encodeURIComponent).join("/");
     var githubUrl = BLOB + branch + "/" + encodedPath;

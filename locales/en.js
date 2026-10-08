@@ -14,7 +14,8 @@ window.LOCALES.en = {
     home: "Home",
     docs: "Docs",
     changelog: "Changelog",
-    github: "GitHub"
+    github: "GitHub",
+    discord: "Discord"
   },
   docs: {
     title: "Documentation",
@@ -54,7 +55,8 @@ window.LOCALES.en = {
   },
   start: {
     title: "Getting started",
-    text: "Downloads and setup instructions will appear here when the first version is released.",
+    text: "Downloads and setup instructions will appear here when the first version is released. Until then, join the community on Discord for updates and questions.",
+    discord: "Join the community on Discord",
     cta: "Follow on GitHub"
   },
   faq: {
@@ -87,6 +89,7 @@ window.LOCALES.en = {
     description: "An open-source tool, currently in development, that will watch for a bite, reel in and recast for you. It runs outside the game and is not a mod.",
     ctaDemo: "Try the demo",
     ctaGithub: "View on GitHub",
+    ctaDiscord: "Join Discord",
     iconAlt: "Project icon: a pixel-art fishing rod with a gear, a red bobber and a hooked fish"
   },
   demo: {

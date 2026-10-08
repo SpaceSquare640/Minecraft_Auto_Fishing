@@ -55,8 +55,8 @@
 .tag--available { color: #7fd66a; }
 
 /* ---------- Getting started ---------- */
-.start__cta { margin-top: var(--space-4); }
-.start__cta svg { color: #fff; }
+.start__actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-4); }
+.start__actions .btn-github svg { color: #fff; }
 
 /* ---------- FAQ ---------- */
 .faq { display: grid; gap: var(--space-2); margin-top: var(--space-4); max-width: 72ch; }

@@ -130,6 +130,7 @@ UI components adapted from [Uiverse.io](https://uiverse.io) (MIT):
 `elijahgummer/kind-pig-24` (badge), `kamehame-ha/kind-otter-31` (GitHub button),
 `chase2k25/rare-quail-40` (demo mode lever), `Yaya12085/grumpy-fox-39` (feature cards),
 `vinodjangid07/afraid-falcon-17` (back-to-top button).
+Discord mark from [Simple Icons](https://simpleicons.org) 16.34.0 (CC0).
 
 ## License
 

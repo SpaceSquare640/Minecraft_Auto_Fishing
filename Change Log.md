@@ -71,3 +71,8 @@ All notable changes to the website branch are recorded here.
 - Activity log: `role="log"` moved from the `<ol>` to a wrapper `<div>` (valid ARIA) — Accessibility
 - Long single words (e.g. future translations) now wrap instead of being clipped; layout grid tracks can no longer exceed the viewport — Layout
 - Lighthouse (mobile and desktop, all pages): Accessibility, Best Practices, SEO 100; 0 failed audits — QA
+
+## 2026-10-08 (Discord)
+
+- Added "Join Discord" buttons (hero and Getting started) and a Discord link in the footer of every page; invite https://discord.gg/aaUQVJeCgC (permanent) — Community
+- Discord mark from Simple Icons 16.34.0 (CC0), used unmodified in brand color #5865F2 (white text 4.61:1) — Assets

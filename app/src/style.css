@@ -1,0 +1,55 @@
+/* Colors and spacing follow the website's design tokens (css/tokens.css). */
+:root {
+  color-scheme: dark;
+  --color-bg: #0f1a2e;
+  --color-surface: #1b2a4a;
+  --color-button: #cc2e2e;
+  --color-accent: #f2c230;
+  --color-text: #f2f4f8;
+  --color-muted: #9aa4b5;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+  --space-2: 0.5rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --border-pixel: 4px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  display: grid;
+  place-items: center;
+}
+
+.panel {
+  width: min(100% - 2 * var(--space-3), 360px);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: var(--border-pixel) solid #000;
+}
+
+h1 { font-size: 1.25rem; margin: 0 0 var(--space-3); }
+.state strong { color: var(--color-accent); text-transform: capitalize; }
+.buttons { display: flex; gap: var(--space-2); margin: var(--space-3) 0; }
+
+button {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  font: inherit;
+  font-weight: 700;
+  color: #fff;
+  background: var(--color-button);
+  border: var(--border-pixel) solid #000;
+  cursor: pointer;
+}
+button.secondary { background: #3a4a6a; }
+button:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+
+.stats { display: grid; grid-template-columns: 1fr auto; gap: var(--space-2); margin: 0; }
+.stats dd { margin: 0; font-variant-numeric: tabular-nums; }
+.note { color: var(--color-muted); font-size: 0.875rem; margin-bottom: 0; }

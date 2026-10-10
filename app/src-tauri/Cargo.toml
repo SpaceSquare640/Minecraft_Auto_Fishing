@@ -1,0 +1,16 @@
+[package]
+name = "minecraft-auto-fishing"
+description = "Minecraft Auto Fishing desktop app"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[build-dependencies]
+tauri-build = { version = "=2.7.1", features = [] }
+
+[dependencies]
+tauri = { version = "=2.12.1", features = [] }
+serde = { version = "=1.0.229", features = ["derive"] }
+maf-engine = { path = "../../crates/engine" }

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Minecraft Auto Fishing</title>
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body>
+    <main class="panel">
+      <h1>Minecraft Auto Fishing</h1>
+      <p class="state">State: <strong id="state">idle</strong></p>
+      <div class="buttons">
+        <button id="start" type="button">Start</button>
+        <button id="stop" type="button" class="secondary">Stop</button>
+      </div>
+      <dl class="stats">
+        <dt>Casts</dt><dd id="casts">0</dd>
+        <dt>Bites</dt><dd id="bites">0</dd>
+        <dt>Timeouts</dt><dd id="timeouts">0</dd>
+      </dl>
+      <p class="note">Development build (P1.1): no game input or bite detection yet.</p>
+    </main>
+  </body>
+</html>

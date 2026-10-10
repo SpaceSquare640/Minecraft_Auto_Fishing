@@ -1,0 +1,8 @@
+[package]
+name = "maf-detectors"
+description = "Bite detector interface (implementations arrive in P1.3)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true

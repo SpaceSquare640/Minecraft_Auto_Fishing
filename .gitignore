@@ -13,3 +13,9 @@ venv/
 .idea/
 Thumbs.db
 .DS_Store
+
+# Rust / Tauri / Node
+/target/
+node_modules/
+/app/dist/
+/app/src-tauri/gen/

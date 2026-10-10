@@ -1,0 +1,15 @@
+[workspace]
+resolver = "3"
+members = ["crates/engine", "crates/detectors", "app/src-tauri"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.98"
+license = "GPL-3.0-only"
+publish = false
+
+[profile.release]
+codegen-units = 1
+lto = true
+strip = true

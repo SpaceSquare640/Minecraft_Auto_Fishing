@@ -1,4 +1,6 @@
 use std::fmt;
+use std::thread;
+use std::time::Duration;
 
 use windows::Win32::UI::Input::KeyboardAndMouse::{
     INPUT, INPUT_0, INPUT_MOUSE, MOUSE_EVENT_FLAGS, MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP,
@@ -6,6 +8,10 @@ use windows::Win32::UI::Input::KeyboardAndMouse::{
 };
 
 use crate::GameWindow;
+
+/// How long the button stays down. Bedrock reads the mouse once per frame, so a press and
+/// release sent together can fall into the same frame and be missed.
+const HOLD: Duration = Duration::from_millis(60);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InputError {
@@ -26,7 +32,8 @@ impl fmt::Display for InputError {
 
 impl std::error::Error for InputError {}
 
-/// Presses and releases the right mouse button once, only if `game` is in the foreground.
+/// Presses the right mouse button, holds it for [`HOLD`] and releases it, only if `game` is in
+/// the foreground. Blocks the calling thread for the hold.
 ///
 /// SendInput always goes to the foreground window, so the check right before sending is what
 /// keeps clicks from landing in another program. Note: if the game runs as administrator,
@@ -35,7 +42,14 @@ pub fn right_click(game: &GameWindow) -> Result<(), InputError> {
     if !game.is_foreground() {
         return Err(InputError::NotForeground);
     }
-    let inputs = [mouse(MOUSEEVENTF_RIGHTDOWN), mouse(MOUSEEVENTF_RIGHTUP)];
+    send(MOUSEEVENTF_RIGHTDOWN)?;
+    thread::sleep(HOLD);
+    // Release even if the focus moved during the hold, so the button is never left down.
+    send(MOUSEEVENTF_RIGHTUP)
+}
+
+fn send(flags: MOUSE_EVENT_FLAGS) -> Result<(), InputError> {
+    let inputs = [mouse(flags)];
     // SAFETY: `inputs` is a valid slice and cbsize is the size of one INPUT, as required.
     let sent = unsafe { SendInput(&inputs, size_of::<INPUT>() as i32) };
     if sent as usize == inputs.len() {

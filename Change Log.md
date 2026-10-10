@@ -12,4 +12,7 @@ No releases yet — the tool is in development.
   - Setup tab installs the Bite Caption resource pack for Java or Bedrock.
   - Optional log files (off by default, kept 7 days) and an update check at startup (can be turned off).
   - If no bite subtitle shows up for several waits in a row, the app suggests what to check (pack, subtitles, casting distance).
+  - Bedrock Edition: clicks now hold the mouse button briefly, so the game no longer misses them.
+  - Pressing F8 after a stop always casts first (reel in before you start).
+  - Turning on log files also saves the events of the current session.
 - Licensed under GPL-3.0 (`LICENSE` added) — 2026-10-08

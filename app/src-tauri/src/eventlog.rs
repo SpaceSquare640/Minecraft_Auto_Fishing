@@ -19,12 +19,19 @@ pub struct Entry {
     /// Local time, "HH:MM:SS".
     pub time: String,
     pub text: String,
+    /// Local date, "YYYY-MM-DD": picks the log file.
+    #[serde(skip)]
+    date: String,
 }
 
 pub struct EventLog {
     entries: VecDeque<Entry>,
     next_id: u64,
     save: bool,
+    /// Newest entry already written to a file.
+    saved_through: u64,
+    sink: fn(&Entry),
+    prune: fn(),
 }
 
 impl EventLog {
@@ -33,6 +40,9 @@ impl EventLog {
             entries: VecDeque::new(),
             next_id: 1,
             save: false,
+            saved_through: 0,
+            sink: write_line,
+            prune: prune_old_files,
         };
         log.set_save(save);
         log
@@ -46,10 +56,15 @@ impl EventLog {
         )
     }
 
+    /// Turning saving on also writes the events of this session that are still in memory.
     pub fn set_save(&mut self, save: bool) {
         self.save = save;
         if save {
-            prune_old_files();
+            (self.prune)();
+            for entry in self.entries.iter().filter(|e| e.id > self.saved_through) {
+                (self.sink)(entry);
+            }
+            self.saved_through = self.next_id - 1;
         }
     }
 
@@ -59,10 +74,12 @@ impl EventLog {
             id: self.next_id,
             time: now.time(),
             text: text.into(),
+            date: now.date(),
         };
         self.next_id += 1;
         if self.save {
-            write_line(&now.date(), &entry);
+            (self.sink)(&entry);
+            self.saved_through = entry.id;
         }
         self.entries.push_back(entry);
         if self.entries.len() > KEEP_IN_MEMORY {
@@ -76,7 +93,8 @@ impl EventLog {
     }
 }
 
-fn write_line(date: &str, entry: &Entry) {
+fn write_line(entry: &Entry) {
+    let date = &entry.date;
     let Some(dir) = EventLog::dir() else { return };
     if fs::create_dir_all(&dir).is_err() {
         return;
@@ -114,11 +132,7 @@ mod tests {
 
     #[test]
     fn memory_keeps_the_newest_entries_and_hands_out_new_ones_only() {
-        let mut log = EventLog {
-            entries: VecDeque::new(),
-            next_id: 1,
-            save: false,
-        };
+        let mut log = memory_log();
         for i in 0..250 {
             log.add(format!("event {i}"));
         }
@@ -126,5 +140,47 @@ mod tests {
         assert_eq!(log.since(0)[0].text, "event 50");
         assert_eq!(log.since(249).len(), 1);
         assert!(log.since(250).is_empty());
+    }
+
+    thread_local! {
+        static WRITTEN: std::cell::RefCell<Vec<String>> = const { std::cell::RefCell::new(Vec::new()) };
+    }
+
+    fn record(entry: &Entry) {
+        WRITTEN.with(|w| w.borrow_mut().push(entry.text.clone()));
+    }
+
+    fn memory_log() -> EventLog {
+        EventLog {
+            entries: VecDeque::new(),
+            next_id: 1,
+            save: false,
+            saved_through: 0,
+            sink: record,
+            prune: || {},
+        }
+    }
+
+    fn written() -> Vec<String> {
+        WRITTEN.with(|w| w.borrow().clone())
+    }
+
+    #[test]
+    fn turning_saving_on_writes_this_session_once() {
+        let mut log = memory_log();
+        log.add("started");
+        log.add("bite");
+        assert!(written().is_empty());
+
+        log.set_save(true);
+        assert_eq!(written(), ["started", "bite"]);
+        log.add("reel");
+        assert_eq!(written(), ["started", "bite", "reel"]);
+
+        // Off and on again: only what happened in between is added.
+        log.set_save(false);
+        log.add("cast");
+        log.set_save(true);
+        assert_eq!(written(), ["started", "bite", "reel", "cast"]);
     }
 }

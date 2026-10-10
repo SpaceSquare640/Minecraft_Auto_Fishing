@@ -81,6 +81,9 @@ pub struct Engine {
     since: Duration,
     focused: bool,
     line_out: bool,
+    /// The game reported the bobber since the last Stop. Our own belief is not trusted after
+    /// a Stop, because the player may use the rod by hand while we are stopped.
+    line_reported: bool,
     stats: Stats,
 }
 
@@ -92,6 +95,7 @@ impl Engine {
             since: Duration::ZERO,
             focused: false,
             line_out: false,
+            line_reported: false,
             stats: Stats::default(),
         }
     }
@@ -127,10 +131,19 @@ impl Engine {
             }
             // Stopping sends no input: the rod is left as it is.
             (Event::Stop, _) => {
+                self.line_reported = false;
                 self.enter(State::Idle, now);
                 vec![]
             }
-            (Event::Start, State::Idle | State::Paused) => self.resume(now),
+            // A fresh start assumes the line is in (Setup asks the player to reel in first),
+            // unless the game told us otherwise. Resuming a pause keeps what we know.
+            (Event::Start, State::Idle) => {
+                if !self.line_reported {
+                    self.line_out = false;
+                }
+                self.resume(now)
+            }
+            (Event::Start, State::Paused) => self.resume(now),
             // The game disagrees with our belief: follow the game. This repairs a click that
             // did the opposite of what we meant, e.g. after the game removed the bobber.
             (Event::LineIn, State::Casting | State::Waiting) => {
@@ -148,10 +161,12 @@ impl Engine {
             // While stopped or paused, just remember where the bobber is.
             (Event::LineIn, State::Idle | State::Paused) => {
                 self.line_out = false;
+                self.line_reported = true;
                 vec![]
             }
             (Event::LineOut, State::Idle | State::Paused) => {
                 self.line_out = true;
+                self.line_reported = true;
                 vec![]
             }
             (Event::Bite, State::Waiting) => {
@@ -431,6 +446,25 @@ mod tests {
         e.step(Event::LineOut, ms(100)); // player cast by hand before starting
         assert_eq!(e.step(Event::Start, ms(200)), CLICK);
         assert_eq!(e.state(), State::Reeling); // so the first click reels in
+    }
+
+    #[test]
+    fn start_after_stop_casts_first() {
+        // Stopped with the line out; the player reels in by hand, which we cannot see.
+        let mut e = waiting();
+        e.step(Event::Stop, ms(2000));
+        assert_eq!(e.step(Event::Start, ms(5000)), CLICK);
+        assert_eq!(e.state(), State::Casting);
+        assert_eq!(e.stats().casts, 2);
+    }
+
+    #[test]
+    fn resume_after_pause_still_reels_first() {
+        let mut e = waiting();
+        e.step(Event::FocusLost, ms(2000));
+        e.step(Event::FocusGained, ms(3000));
+        assert_eq!(e.step(Event::Start, ms(4000)), CLICK);
+        assert_eq!(e.state(), State::Reeling);
     }
 
     #[test]

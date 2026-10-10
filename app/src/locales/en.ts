@@ -4,6 +4,7 @@ export const en = {
   state: {
     label: "State",
     idle: "Idle",
+    starting: "Starting",
     casting: "Casting",
     waiting: "Waiting for a bite",
     reeling: "Reeling in",

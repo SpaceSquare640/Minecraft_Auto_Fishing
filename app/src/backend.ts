@@ -3,7 +3,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import { demoBackend } from "./demo-backend";
 
-export type EngineState = "idle" | "casting" | "waiting" | "reeling" | "paused";
+export type EngineState = "idle" | "starting" | "casting" | "waiting" | "reeling" | "paused";
 export type Link = "github" | "discord" | "website" | "releases";
 
 export interface Status {

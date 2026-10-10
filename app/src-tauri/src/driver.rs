@@ -371,6 +371,7 @@ impl NoBiteWatch {
 fn state_name(state: State) -> &'static str {
     match state {
         State::Idle => "idle",
+        State::Starting => "starting",
         State::Casting => "casting",
         State::Waiting => "waiting",
         State::Reeling => "reeling",

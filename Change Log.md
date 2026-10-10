@@ -2,6 +2,10 @@
 
 All notable changes to the Minecraft Auto Fishing tool are documented here.
 
+## Unreleased
+
+- After you press F8, the app waits half a second before the first cast, so Bedrock Edition no longer misses it — 2026-10-10
+
 ## 0.1.0-alpha.1 — 2026-10-10 (test pre-release, Windows)
 
 First test build of the Windows app, for testing only. Download it from [GitHub Releases](https://github.com/SpaceSquare640/Minecraft_Auto_Fishing/releases). The installer is not code-signed yet, so Windows SmartScreen may warn you (More info › Run anyway).

@@ -3,6 +3,7 @@
 // Nothing is installed, saved or sent anywhere.
 import type { Backend, EngineState, Link, LogEntry, Settings, Status } from "./backend";
 
+const START_MS = 500;
 const SETTLE_MS = 3000;
 const RECAST_MS = 600;
 const BITE_MIN_MS = 3000;
@@ -77,7 +78,10 @@ export function demoBackend(): Backend {
     appInfo: async () => ({ version: "0.1.0" }),
     status: async () => snapshot(),
     start: async () => {
-      if (state === "idle" || state === "paused") cast();
+      if (state === "idle" || state === "paused") {
+        enter("starting");
+        later(START_MS, cast);
+      }
       return snapshot();
     },
     stop: async () => {

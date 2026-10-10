@@ -17,6 +17,9 @@ pub struct Config {
     pub bite_timeout: Duration,
     /// Pause between reeling in and casting again.
     pub recast_delay: Duration,
+    /// Wait after Start before the first click: the start hotkey may still be held down, and
+    /// Bedrock misses a click sent at the same moment.
+    pub start_delay: Duration,
 }
 
 impl Default for Config {
@@ -25,6 +28,7 @@ impl Default for Config {
             settle: Duration::from_millis(3000),
             bite_timeout: Duration::from_secs(45),
             recast_delay: Duration::from_millis(600),
+            start_delay: Duration::from_millis(500),
         }
     }
 }
@@ -33,6 +37,8 @@ impl Default for Config {
 pub enum State {
     /// Stopped by the player.
     Idle,
+    /// Just started; the first click comes after the start delay.
+    Starting,
     /// Line just cast; waiting for it to settle.
     Casting,
     /// Waiting for a bite.
@@ -159,12 +165,12 @@ impl Engine {
                 vec![]
             }
             // While stopped or paused, just remember where the bobber is.
-            (Event::LineIn, State::Idle | State::Paused) => {
+            (Event::LineIn, State::Idle | State::Paused | State::Starting) => {
                 self.line_out = false;
                 self.line_reported = true;
                 vec![]
             }
-            (Event::LineOut, State::Idle | State::Paused) => {
+            (Event::LineOut, State::Idle | State::Paused | State::Starting) => {
                 self.line_out = true;
                 self.line_reported = true;
                 vec![]
@@ -172,6 +178,14 @@ impl Engine {
             (Event::Bite, State::Waiting) => {
                 self.stats.bites += 1;
                 self.reel(now)
+            }
+            (Event::Tick, State::Starting) if elapsed >= self.cfg.start_delay => {
+                if self.line_out {
+                    // The bobber is still out from before the pause: bring it in first.
+                    self.reel(now)
+                } else {
+                    self.cast(now)
+                }
             }
             (Event::Tick, State::Casting) if elapsed >= self.cfg.settle => {
                 self.enter(State::Waiting, now);
@@ -199,7 +213,10 @@ impl Engine {
     }
 
     fn is_running(&self) -> bool {
-        matches!(self.state, State::Casting | State::Waiting | State::Reeling)
+        matches!(
+            self.state,
+            State::Starting | State::Casting | State::Waiting | State::Reeling
+        )
     }
 
     fn resume(&mut self, now: Duration) -> Vec<Action> {
@@ -207,12 +224,8 @@ impl Engine {
             self.enter(State::Paused, now);
             return vec![];
         }
-        if self.line_out {
-            // The bobber is still out from before the pause: bring it in first.
-            self.reel(now)
-        } else {
-            self.cast(now)
-        }
+        self.enter(State::Starting, now);
+        vec![]
     }
 
     fn cast(&mut self, now: Duration) -> Vec<Action> {
@@ -249,14 +262,22 @@ mod tests {
             settle: ms(1000),
             bite_timeout: ms(10_000),
             recast_delay: ms(500),
+            // Zero here so the other tests can start and cast at the same instant.
+            start_delay: Duration::ZERO,
         }
+    }
+
+    /// Start, then the tick that ends the start delay; returns that tick's actions.
+    fn start(e: &mut Engine, at: Duration) -> Vec<Action> {
+        assert!(e.step(Event::Start, at).is_empty());
+        e.step(Event::Tick, at)
     }
 
     /// Focused engine that has just cast at t = 0.
     fn casting() -> Engine {
         let mut e = Engine::new(cfg());
         e.step(Event::FocusGained, ms(0));
-        assert_eq!(e.step(Event::Start, ms(0)), CLICK);
+        assert_eq!(start(&mut e, ms(0)), CLICK);
         e
     }
 
@@ -348,7 +369,7 @@ mod tests {
         assert!(e.step(Event::FocusGained, ms(61_000)).is_empty());
         assert_eq!(e.state(), State::Paused);
         // Start: the bobber is still out, so the first click reels it in.
-        assert_eq!(e.step(Event::Start, ms(62_000)), CLICK);
+        assert_eq!(start(&mut e, ms(62_000)), CLICK);
         assert_eq!(e.state(), State::Reeling);
         assert_eq!(e.step(Event::Tick, ms(62_500)), CLICK);
         assert_eq!(e.state(), State::Casting);
@@ -386,7 +407,7 @@ mod tests {
         assert_eq!(e.state(), State::Paused);
         assert!(!e.line_out());
         assert_eq!(e.stats().casts, 0);
-        assert_eq!(e.step(Event::Start, ms(1000)), CLICK);
+        assert_eq!(start(&mut e, ms(1000)), CLICK);
         assert_eq!(e.state(), State::Casting);
         assert!(e.line_out());
     }
@@ -397,7 +418,7 @@ mod tests {
         e.step(Event::Bite, ms(2000));
         e.input_failed(ms(2001));
         assert!(e.line_out());
-        assert_eq!(e.step(Event::Start, ms(3000)), CLICK);
+        assert_eq!(start(&mut e, ms(3000)), CLICK);
         assert_eq!(e.state(), State::Reeling);
         assert!(!e.line_out());
     }
@@ -444,7 +465,7 @@ mod tests {
         let mut e = Engine::new(cfg());
         e.step(Event::FocusGained, ms(0));
         e.step(Event::LineOut, ms(100)); // player cast by hand before starting
-        assert_eq!(e.step(Event::Start, ms(200)), CLICK);
+        assert_eq!(start(&mut e, ms(200)), CLICK);
         assert_eq!(e.state(), State::Reeling); // so the first click reels in
     }
 
@@ -453,7 +474,7 @@ mod tests {
         // Stopped with the line out; the player reels in by hand, which we cannot see.
         let mut e = waiting();
         e.step(Event::Stop, ms(2000));
-        assert_eq!(e.step(Event::Start, ms(5000)), CLICK);
+        assert_eq!(start(&mut e, ms(5000)), CLICK);
         assert_eq!(e.state(), State::Casting);
         assert_eq!(e.stats().casts, 2);
     }
@@ -463,8 +484,49 @@ mod tests {
         let mut e = waiting();
         e.step(Event::FocusLost, ms(2000));
         e.step(Event::FocusGained, ms(3000));
-        assert_eq!(e.step(Event::Start, ms(4000)), CLICK);
+        assert_eq!(start(&mut e, ms(4000)), CLICK);
         assert_eq!(e.state(), State::Reeling);
+    }
+
+    fn delayed() -> Engine {
+        let mut e = Engine::new(Config {
+            start_delay: ms(500),
+            ..cfg()
+        });
+        e.step(Event::FocusGained, ms(0));
+        e
+    }
+
+    #[test]
+    fn first_click_waits_for_the_start_delay() {
+        let mut e = delayed();
+        assert!(e.step(Event::Start, ms(1000)).is_empty());
+        assert_eq!(e.state(), State::Starting);
+        assert!(e.step(Event::Bite, ms(1200)).is_empty());
+        assert!(e.step(Event::Tick, ms(1499)).is_empty());
+        assert_eq!(e.step(Event::Tick, ms(1500)), CLICK);
+        assert_eq!(e.state(), State::Casting);
+        assert_eq!(e.stats().casts, 1);
+    }
+
+    #[test]
+    fn stop_during_the_start_delay_cancels() {
+        let mut e = delayed();
+        e.step(Event::Start, ms(1000));
+        assert!(e.step(Event::Stop, ms(1200)).is_empty());
+        assert!(e.step(Event::Tick, ms(2000)).is_empty());
+        assert_eq!(e.state(), State::Idle);
+        assert_eq!(e.stats().casts, 0);
+    }
+
+    #[test]
+    fn focus_loss_during_the_start_delay_pauses() {
+        let mut e = delayed();
+        e.step(Event::Start, ms(1000));
+        assert!(e.step(Event::FocusLost, ms(1200)).is_empty());
+        assert!(e.step(Event::Tick, ms(2000)).is_empty());
+        assert_eq!(e.state(), State::Paused);
+        assert_eq!(e.stats().casts, 0);
     }
 
     #[test]

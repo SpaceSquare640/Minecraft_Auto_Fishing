@@ -1,8 +1,13 @@
-//! Bite detectors share one interface, so the engine never needs to know how a
-//! bite was found (ADR-003). Planned implementations (P1.3):
-//! - `ResourcePackMarker`: pixel match of the `[AMF] BITE` caption (Bedrock default)
-//! - `SubtitleOcr`: Windows OCR of the vanilla bite caption (Java default)
+//! Bite detectors share one interface, so the engine never needs to know how a bite
+//! was found (ADR-003):
+//! - [`marker::MarkerDetector`]: the `[AMF] BITE` caption of the resource pack, found by
+//!   its pixel profile (Bedrock default, optional on Java)
+//! - [`subtitle::SubtitleDetector`]: the vanilla bite caption read by OCR (Java default)
 #![forbid(unsafe_code)]
+
+pub mod caption;
+pub mod marker;
+pub mod subtitle;
 
 use std::time::Duration;
 
@@ -22,59 +27,57 @@ pub struct Bite {
 }
 
 pub trait Detector {
-    /// What the detector consumes, e.g. a cropped frame or an audio chunk.
+    /// What the detector consumes, e.g. the caption lines of one frame.
     type Input: ?Sized;
 
     fn id(&self) -> DetectorId;
 
-    /// Returns a bite when this input completes one.
+    /// Returns a bite when a bite caption newly appears in this input.
     fn feed(&mut self, input: &Self::Input, now: Duration) -> Option<Bite>;
+}
 
-    /// Forget any partial state (called after each cast).
-    fn reset(&mut self);
+/// Turns "caption visible in this frame" into "caption newly appeared".
+///
+/// A caption counts as new only after it was absent for at least `DEBOUNCE`. This hides
+/// one-frame flicker and, because nothing is reset on a cast, a caption that is still on
+/// screen from the previous bite can never count as a new one (Phase 0, §7.2).
+#[derive(Debug, Default, Clone)]
+pub struct Onset {
+    last_seen: Option<Duration>,
+}
+
+impl Onset {
+    pub const DEBOUNCE: Duration = Duration::from_millis(500);
+
+    pub fn update(&mut self, present: bool, now: Duration) -> bool {
+        let new = present
+            && self
+                .last_seen
+                .is_none_or(|seen| now.saturating_sub(seen) >= Self::DEBOUNCE);
+        if present {
+            self.last_seen = Some(now);
+        }
+        new
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    /// Reports a bite the first time it sees `true`.
-    struct Flag {
-        fired: bool,
-    }
-
-    impl Detector for Flag {
-        type Input = bool;
-
-        fn id(&self) -> DetectorId {
-            DetectorId::ResourcePackMarker
-        }
-
-        fn feed(&mut self, input: &bool, now: Duration) -> Option<Bite> {
-            if *input && !self.fired {
-                self.fired = true;
-                return Some(Bite {
-                    at: now,
-                    confidence: 1.0,
-                    source: self.id(),
-                });
-            }
-            None
-        }
-
-        fn reset(&mut self) {
-            self.fired = false;
-        }
+    fn ms(v: u64) -> Duration {
+        Duration::from_millis(v)
     }
 
     #[test]
-    fn detectors_are_usable_through_the_trait() {
-        let mut d = Flag { fired: false };
-        assert!(d.feed(&false, Duration::ZERO).is_none());
-        let bite = d.feed(&true, Duration::from_secs(1)).expect("bite");
-        assert_eq!(bite.source, DetectorId::ResourcePackMarker);
-        assert!(d.feed(&true, Duration::from_secs(2)).is_none());
-        d.reset();
-        assert!(d.feed(&true, Duration::from_secs(3)).is_some());
+    fn onset_fires_once_per_appearance_and_ignores_flicker() {
+        let mut o = Onset::default();
+        assert!(!o.update(false, ms(0)));
+        assert!(o.update(true, ms(100)));
+        assert!(!o.update(true, ms(130)));
+        assert!(!o.update(false, ms(160))); // one-frame flicker...
+        assert!(!o.update(true, ms(190))); // ...is not a new caption
+        assert!(!o.update(false, ms(400)));
+        assert!(o.update(true, ms(800))); // absent for 610 ms: new caption
     }
 }

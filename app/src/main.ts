@@ -11,6 +11,8 @@ function el(id: string): HTMLElement {
 
 function hint(s: Status): string {
   if (!s.game) return "Open Minecraft (Java or Bedrock) to begin.";
+  if (s.game.edition === "bedrock" && s.state === "idle")
+    return `Bedrock needs the Bite Caption resource pack. Switch to Minecraft and press ${s.hotkey ?? "Start"} to start.`;
   if (s.state === "paused") return `Paused. Switch to Minecraft and press ${s.hotkey ?? "Start"} to continue.`;
   if (s.state === "idle") return `Switch to Minecraft and press ${s.hotkey ?? "Start"} to start.`;
   return `Fishing. Press ${s.hotkey ?? "Stop"} in the game to stop.`;
@@ -24,6 +26,12 @@ function render(s: Status): void {
   el("casts").textContent = String(s.casts);
   el("bites").textContent = String(s.bites);
   el("timeouts").textContent = String(s.timeouts);
+  const d = s.detection;
+  el("detection").textContent = d.methods.length
+    ? d.methods.join(" + ") + (d.ocrLanguage ? ` (OCR ${d.ocrLanguage})` : "")
+    : "-";
+  el("last-bite").textContent =
+    d.lastBiteSecondsAgo === null ? "-" : `${Math.round(d.lastBiteSecondsAgo)} s ago (${d.lastBiteSource})`;
   el("hint").textContent = hint(s);
   const error = el("error");
   error.textContent = s.lastError ?? "";
@@ -37,6 +45,6 @@ async function call(action: "status" | "start" | "stop"): Promise<void> {
 el("start").addEventListener("click", () => void call("start"));
 el("stop").addEventListener("click", () => void call("stop"));
 el("build").textContent =
-  backend.kind === "app" ? "Development build: no bite detection yet." : "App Preview: simulated, nothing is sent to a game.";
+  backend.kind === "app" ? "Development build." : "App Preview: simulated, nothing is sent to a game.";
 void call("status");
 setInterval(() => void call("status"), 250);

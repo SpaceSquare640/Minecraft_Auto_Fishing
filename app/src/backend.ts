@@ -15,6 +15,12 @@ export interface Status {
   captureFps: number | null;
   hotkey: string | null;
   lastError: string | null;
+  detection: {
+    methods: string[];
+    ocrLanguage: string | null;
+    lastBiteSource: string | null;
+    lastBiteSecondsAgo: number | null;
+  };
 }
 
 export interface Backend {

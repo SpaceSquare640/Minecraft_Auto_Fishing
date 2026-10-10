@@ -1,9 +1,10 @@
 // No console window in release builds.
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod detect;
 mod driver;
 
-use std::sync::{Mutex, MutexGuard};
+use std::sync::{Arc, Mutex, MutexGuard};
 use std::time::Duration;
 
 use driver::{Driver, Status};
@@ -43,10 +44,20 @@ fn status(app: tauri::State<'_, AppState>) -> Status {
 }
 
 fn main() {
+    let detection = Arc::new(detect::Shared::default());
     tauri::Builder::default()
-        .manage(AppState(Mutex::new(Driver::new())))
-        .setup(|app| {
+        .manage(AppState(Mutex::new(Driver::new(detection.clone()))))
+        .setup(move |app| {
             let handle = app.handle().clone();
+
+            let on_bite = handle.clone();
+            std::thread::Builder::new()
+                .name("maf-detect".into())
+                .spawn(move || {
+                    detect::run(detection, move |bite| {
+                        on_bite.state::<AppState>().driver().bite(bite)
+                    })
+                })?;
 
             let on_press = handle.clone();
             let registered = hotkey::spawn(move || on_press.state::<AppState>().driver().toggle());

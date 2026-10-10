@@ -11,6 +11,7 @@ export function demoBackend(): Backend {
   let state: EngineState = "idle";
   let casts = 0;
   let bites = 0;
+  let lastBite: number | null = null;
   let timer: ReturnType<typeof setTimeout> | undefined;
 
   const later = (ms: number, next: () => void): void => {
@@ -28,6 +29,7 @@ export function demoBackend(): Backend {
     state = "waiting";
     later(BITE_MIN_MS + Math.random() * (BITE_MAX_MS - BITE_MIN_MS), () => {
       bites += 1;
+      lastBite = Date.now();
       state = "reeling";
       later(RECAST_MS, cast);
     });
@@ -43,6 +45,12 @@ export function demoBackend(): Backend {
     captureFps: 60,
     hotkey: "F8",
     lastError: null,
+    detection: {
+      methods: ["subtitles", "resource pack"],
+      ocrLanguage: "en-US",
+      lastBiteSource: lastBite === null ? null : "subtitles",
+      lastBiteSecondsAgo: lastBite === null ? null : (Date.now() - lastBite) / 1000,
+    },
   });
 
   return {

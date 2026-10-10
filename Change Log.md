@@ -2,17 +2,20 @@
 
 All notable changes to the Minecraft Auto Fishing tool are documented here.
 
-## Unreleased
+## 0.1.0-alpha.1 — 2026-10-10 (test pre-release, Windows)
 
-No releases yet — the tool is in development.
+First test build of the Windows app, for testing only. Download it from [GitHub Releases](https://github.com/SpaceSquare640/Minecraft_Auto_Fishing/releases). The installer is not code-signed yet, so Windows SmartScreen may warn you (More info › Run anyway).
 
-- First Windows app in development (not released yet) — 2026-10-10
+- First Windows app
   - Bite detection: Java Edition reads the bite subtitle in your game language; Bedrock Edition uses the new Bite Caption resource pack.
   - F8 starts and stops fishing; the app pauses when Minecraft is not the active window.
   - Setup tab installs the Bite Caption resource pack for Java or Bedrock.
   - Optional log files (off by default, kept 7 days) and an update check at startup (can be turned off).
   - If no bite subtitle shows up for several waits in a row, the app suggests what to check (pack, subtitles, casting distance).
-  - Bedrock Edition: clicks now hold the mouse button briefly, so the game no longer misses them.
+  - Bedrock Edition: clicks hold the mouse button briefly, so the game does not miss them (being tested).
   - Pressing F8 after a stop always casts first (reel in before you start).
   - Turning on log files also saves the events of the current session.
+
+## Earlier
+
 - Licensed under GPL-3.0 (`LICENSE` added) — 2026-10-08

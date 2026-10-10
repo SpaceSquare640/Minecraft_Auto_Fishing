@@ -2,7 +2,7 @@
 
 Minecraft Auto Fishing is an open-source tool that will automate the repetitive part of fishing in Minecraft: watching the bobber, reeling in at the right moment and casting again.
 
-> **Status:** In development. Nothing described below is released yet; it describes the planned behavior.
+> **Status:** In development. A test pre-release for Windows is on [GitHub Releases](https://github.com/SpaceSquare640/Minecraft_Auto_Fishing/releases); behavior may still change.
 
 ## Supported platforms
 

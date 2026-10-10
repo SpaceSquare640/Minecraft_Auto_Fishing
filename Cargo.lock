@@ -1753,15 +1753,15 @@ checksum = "f9f8bd3e56ce4dfc153cf470fffbfa98c7620958b312ca5c3a4b8d5181fd13c6"
 
 [[package]]
 name = "maf-detectors"
-version = "0.1.0"
+version = "0.1.0-alpha.1"
 
 [[package]]
 name = "maf-engine"
-version = "0.1.0"
+version = "0.1.0-alpha.1"
 
 [[package]]
 name = "maf-game-profile"
-version = "0.1.0"
+version = "0.1.0-alpha.1"
 dependencies = [
  "serde_json",
  "zip",
@@ -1769,7 +1769,7 @@ dependencies = [
 
 [[package]]
 name = "maf-platform-win"
-version = "0.1.0"
+version = "0.1.0-alpha.1"
 dependencies = [
  "windows",
  "windows-capture",
@@ -1809,7 +1809,7 @@ checksum = "6877bb514081ee2a7ff5ef9de3281f14a4dd4bceac4c09388074a6b5df8a139a"
 
 [[package]]
 name = "minecraft-auto-fishing"
-version = "0.1.0"
+version = "0.1.0-alpha.1"
 dependencies = [
  "maf-detectors",
  "maf-engine",

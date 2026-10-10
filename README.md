@@ -17,7 +17,7 @@
 
 ---
 
-**Status:** In development — no release yet.
+**Status:** In development — a test pre-release for Windows is on [GitHub Releases](https://github.com/SpaceSquare640/Minecraft_Auto_Fishing/releases).
 
 | | |
 |---|---|

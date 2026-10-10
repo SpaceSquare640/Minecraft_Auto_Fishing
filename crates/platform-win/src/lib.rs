@@ -3,6 +3,7 @@
 //! - [`find_game_window`]: locate a Minecraft window by the process that owns it
 //! - [`right_click`]: one right click, sent only while the game window is in the foreground
 //! - [`release_right`]: a lone right-button release, sent before the first click after a focus change
+//! - [`cursor_visible`]: whether the mouse cursor is shown (Minecraft shows it only in menus)
 //! - [`hotkey::spawn`]: global start/stop hotkey via `RegisterHotKey` (no keyboard hook)
 //! - [`capture::Capture`]: Windows.Graphics.Capture of the game window's subtitle area
 //! - [`ocr::Ocr`]: Windows.Media.Ocr for the vanilla Java bite caption
@@ -12,11 +13,13 @@
 
 pub mod capture;
 pub mod clock;
+mod cursor;
 pub mod hotkey;
 mod input;
 pub mod ocr;
 pub mod shell;
 mod window;
 
+pub use cursor::cursor_visible;
 pub use input::{InputError, release_right, right_click};
 pub use window::{Edition, GameWindow, find_game_window};

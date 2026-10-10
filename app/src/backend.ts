@@ -25,6 +25,8 @@ export interface Status {
   };
   /** The bite subtitle was not seen for several waits in a row. */
   noBiteHint: boolean;
+  /** The game window is in front but a menu is open, so nothing is clicked. */
+  menuOpen: boolean;
 }
 
 export interface Settings {

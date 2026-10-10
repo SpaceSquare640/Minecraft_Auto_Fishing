@@ -15,6 +15,7 @@ export const en = {
     idle: "Switch to Minecraft and press {key} to start.",
     bedrockIdle: "Bedrock needs the Bite Caption resource pack (see Setup). Switch to Minecraft and press {key} to start.",
     paused: "Paused. Switch to Minecraft and press {key} to continue.",
+    menuOpen: "The game menu is open, so nothing is clicked. Close it, then press {key}.",
     running: "Fishing. Press {key} in the game to stop.",
   },
   noBite: {

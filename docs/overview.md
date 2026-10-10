@@ -20,7 +20,7 @@ Consoles (Xbox, PlayStation, Nintendo Switch) and mobile devices (iOS, Android) 
 3. **Detect a bite** — it reads the game's on-screen subtitles and waits for the bite subtitle.
 4. **Reel in** — it reels in immediately, then casts again and repeats.
 
-Press **F8** again to stop. The tool also pauses when Minecraft is not the active window, and only sends clicks to Minecraft.
+Press **F8** again to stop. The tool also pauses when Minecraft is not the active window or a game menu (pause, inventory, chat) is open, and only sends clicks to Minecraft.
 
 ### Bite detection
 

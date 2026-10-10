@@ -57,6 +57,7 @@ function confirmDialog(text: string): Promise<boolean> {
 function hint(s: Status): string {
   const key = s.hotkey ?? "Start";
   if (!s.game) return t("hint.noGame");
+  if (s.menuOpen && (s.state === "paused" || s.state === "idle")) return t("hint.menuOpen", { key });
   if (s.state === "paused") return t("hint.paused", { key });
   if (s.state === "idle") return t(s.game.edition === "bedrock" ? "hint.bedrockIdle" : "hint.idle", { key });
   return t("hint.running", { key });

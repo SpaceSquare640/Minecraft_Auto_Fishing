@@ -2,6 +2,10 @@
 
 All notable changes to the Minecraft Auto Fishing tool are documented here.
 
+## Unreleased
+
+- Fishing pauses while a game menu (pause, inventory, chat) is open, so clicks never land in a menu, for example splitting item stacks in the Java inventory — 2026-10-11
+
 ## 0.1.0-alpha.2 — 2026-10-10 (test pre-release, Windows)
 
 Second test build of the Windows app, for testing only. Download it from [GitHub Releases](https://github.com/SpaceSquare640/Minecraft_Auto_Fishing/releases). The installer is not code-signed yet, so Windows SmartScreen or Microsoft Defender may warn you.

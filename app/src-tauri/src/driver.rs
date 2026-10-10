@@ -11,7 +11,9 @@ use maf_detectors::{Bite, DetectorId};
 use maf_engine::{Action, Config, Engine, Event, State, Stats};
 use maf_game_profile::{BITE_KEY, JavaProfile, RETRIEVE_KEY, THROW_KEY, ocr_language_tag};
 use maf_platform_win::capture::Capture;
-use maf_platform_win::{Edition, GameWindow, find_game_window, release_right, right_click};
+use maf_platform_win::{
+    Edition, GameWindow, cursor_visible, find_game_window, release_right, right_click,
+};
 use serde::Serialize;
 
 use crate::detect::{self, Plan};
@@ -34,6 +36,8 @@ pub struct Driver {
     game: Option<GameWindow>,
     capture: Option<Capture>,
     focused: bool,
+    /// The game window is in front but shows the cursor: a menu is open.
+    menu_open: bool,
     /// A click reached the game since its window last got the focus.
     primed: bool,
     last_find: Option<Instant>,
@@ -63,6 +67,8 @@ pub struct Status {
     detection: DetectionInfo,
     /// The bite subtitle was not seen for several waits in a row.
     no_bite_hint: bool,
+    /// The game window is in front but a menu is open, so the app does not click.
+    menu_open: bool,
 }
 
 #[derive(Serialize)]
@@ -90,6 +96,7 @@ impl Driver {
             game: None,
             capture: None,
             focused: false,
+            menu_open: false,
             primed: false,
             last_find: None,
             fps: None,
@@ -156,7 +163,16 @@ impl Driver {
     pub fn tick(&mut self) {
         self.track_game();
         self.update_fps();
-        let focused = self.game.as_ref().is_some_and(GameWindow::is_foreground);
+        let foreground = self.game.as_ref().is_some_and(GameWindow::is_foreground);
+        let (focused, menu_open) = focus_state(foreground, foreground && cursor_visible());
+        if menu_open != self.menu_open {
+            self.menu_open = menu_open;
+            self.log(if menu_open {
+                "Game menu open: not clicking"
+            } else {
+                "Game menu closed"
+            });
+        }
         if focused != self.focused {
             self.focused = focused;
             self.primed = false;
@@ -213,6 +229,7 @@ impl Driver {
                 last_bite_seconds_ago: self.last_bite.map(|(_, at)| at.elapsed().as_secs_f32()),
             },
             no_bite_hint: self.no_bite.showing(),
+            menu_open: self.menu_open,
         }
     }
 
@@ -369,6 +386,14 @@ fn plan_for(edition: Edition) -> Plan {
     }
 }
 
+/// Whether the app may click (`focused`) and whether a game menu blocks it. Minecraft shows the
+/// cursor only in menus (pause, inventory, chat); a click there would act on the menu, e.g. split
+/// item stacks in the Java inventory. A menu counts as leaving the game, so fishing pauses.
+fn focus_state(foreground: bool, cursor_shown: bool) -> (bool, bool) {
+    let menu_open = foreground && cursor_shown;
+    (foreground && !menu_open, menu_open)
+}
+
 /// Counts waits that ended without a bite. Several in a row usually means the game shows no
 /// bite subtitle (pack off, subtitles off or the bobber too far away).
 #[derive(Default)]
@@ -413,6 +438,15 @@ mod tests {
             timeouts,
             ..Stats::default()
         }
+    }
+
+    #[test]
+    fn a_visible_cursor_in_the_game_means_a_menu() {
+        assert_eq!(focus_state(true, false), (true, false));
+        assert_eq!(focus_state(true, true), (false, true));
+        // Another window in front: not focused, and not a game menu either.
+        assert_eq!(focus_state(false, true), (false, false));
+        assert_eq!(focus_state(false, false), (false, false));
     }
 
     #[test]

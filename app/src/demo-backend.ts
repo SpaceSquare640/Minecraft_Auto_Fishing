@@ -70,6 +70,7 @@ export function demoBackend(): Backend {
       lastBiteSecondsAgo: lastBite === null ? null : (Date.now() - lastBite) / 1000,
     },
     noBiteHint: false,
+    menuOpen: false,
   });
 
   add("App Preview started");

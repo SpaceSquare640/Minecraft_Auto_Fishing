@@ -114,3 +114,7 @@ All notable changes to the website branch are recorded here.
 - Added an "App preview" section to the home page: the real app interface, running on the simulated backend, in an embedded window with a link to open it as a full page — Content
 - Added `app-preview/` (Vite build of the app UI from `Source_Code`, with its own CSP) and `scripts/sync-app-preview.js` to copy it; the home page CSP allows framing this site only (`frame-src 'self'`) — Website
 - `check-site.js` checks the App Preview's CSP and file references; `smoke-test.js` checks it loads on the live site; `build.js` publishes it — CI/CD
+
+## 2026-10-10 (App preview 0.1.0-alpha.2)
+
+- Updated the App Preview to the 0.1.0-alpha.2 app (Source_Code f83206d) — Content

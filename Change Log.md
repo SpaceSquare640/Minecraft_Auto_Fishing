@@ -99,3 +99,8 @@ All notable changes to the website branch are recorded here.
 ## 2026-10-08 (Supported platforms)
 
 - Stated the supported editions and platforms on the home page, in the FAQ, the feature cards and the page description: Minecraft: Java Edition (Windows, macOS, Linux) and Bedrock Edition (Windows); consoles and mobile are not supported — Content
+
+## 2026-10-10 (Issue forms and sponsors)
+
+- Added issue forms on `Source_Code` (`.github/ISSUE_TEMPLATE/`): bug report and feature request; blank issues are off and the issue chooser links to Discord, the documentation and private security reporting — Repository
+- Added a Sponsor button (`Source_Code`: `.github/FUNDING.yml`) with Buy Me a Coffee and PayPal — Repository

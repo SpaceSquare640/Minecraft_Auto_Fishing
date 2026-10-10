@@ -5,6 +5,7 @@ All notable changes to the Minecraft Auto Fishing tool are documented here.
 ## Unreleased
 
 - After you press F8, the app waits half a second before the first cast, so Bedrock Edition no longer misses it — 2026-10-10
+- The Windows installer shows the app icon instead of the default installer icon — 2026-10-10
 
 ## 0.1.0-alpha.1 — 2026-10-10 (test pre-release, Windows)
 

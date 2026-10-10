@@ -1,0 +1,18 @@
+{
+  "entity_sounds": {
+    "entities": {
+      "fishing_hook": {
+        "events": {
+          "splash": {
+            "sound": "amf.fishing.bite"
+          }
+        },
+        "pitch": [
+          0.6,
+          1.4
+        ],
+        "volume": 0.25
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "entity.fishing_bobber.splash": {
+    "replace": true,
+    "sounds": [
+      "random/splash"
+    ],
+    "subtitle": "amf.subtitle.bite"
+  }
+}

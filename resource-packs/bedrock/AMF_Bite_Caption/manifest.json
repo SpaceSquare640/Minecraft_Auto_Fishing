@@ -1,0 +1,36 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Minecraft Auto Fishing - Bite Caption",
+    "description": "Shows a dedicated caption when a fish bites. Other splashes are unchanged.",
+    "uuid": "ab28b61e-9d97-4601-89a9-723d0ce0fe5e",
+    "version": [
+      0,
+      1,
+      1
+    ],
+    "min_engine_version": [
+      1,
+      21,
+      0
+    ]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "77066193-71e4-4fd2-97db-c98b7afa8887",
+      "version": [
+        0,
+        1,
+        1
+      ]
+    }
+  ],
+  "metadata": {
+    "authors": [
+      "SpaceSquare640"
+    ],
+    "license": "GPL-3.0-only",
+    "url": "https://spacesquare640.github.io/Minecraft_Auto_Fishing/"
+  }
+}

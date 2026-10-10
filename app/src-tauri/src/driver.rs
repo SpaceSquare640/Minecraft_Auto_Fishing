@@ -14,6 +14,9 @@ use maf_platform_win::{Edition, GameWindow, find_game_window, right_click};
 use serde::Serialize;
 
 use crate::detect::{self, Plan};
+use crate::eventlog::EventLog;
+
+pub type SharedLog = Arc<std::sync::Mutex<EventLog>>;
 
 /// How often to look for the game window while none is known.
 const FIND_INTERVAL: Duration = Duration::from_secs(1);
@@ -31,6 +34,7 @@ pub struct Driver {
     last_error: Option<String>,
     detection: Arc<detect::Shared>,
     last_bite: Option<(DetectorId, Instant)>,
+    log: SharedLog,
 }
 
 #[derive(Serialize)]
@@ -66,7 +70,7 @@ pub struct GameInfo {
 }
 
 impl Driver {
-    pub fn new(detection: Arc<detect::Shared>) -> Self {
+    pub fn new(detection: Arc<detect::Shared>, log: SharedLog) -> Self {
         let now = Instant::now();
         Self {
             engine: Engine::new(Config::default()),
@@ -81,12 +85,17 @@ impl Driver {
             last_error: None,
             detection,
             last_bite: None,
+            log,
         }
     }
 
     /// A detector saw a new bite caption.
     /// The game showed the bobber being thrown or pulled in.
     pub fn line(&mut self, event: LineEvent) {
+        self.log(match event {
+            LineEvent::Out => "Game: bobber thrown",
+            LineEvent::In => "Game: bobber retrieved",
+        });
         self.feed(match event {
             LineEvent::Out => Event::LineOut,
             LineEvent::In => Event::LineIn,
@@ -94,6 +103,12 @@ impl Driver {
     }
 
     pub fn bite(&mut self, bite: Bite) {
+        let source = match bite.source {
+            DetectorId::ResourcePackMarker => "resource pack",
+            DetectorId::SubtitleOcr => "subtitles",
+            DetectorId::Audio => "audio",
+        };
+        self.log(format!("Bite seen ({source}, {:.2})", bite.confidence));
         self.last_bite = Some((bite.source, Instant::now()));
         self.feed(Event::Bite);
     }
@@ -103,6 +118,7 @@ impl Driver {
     }
 
     pub fn set_error(&mut self, message: String) {
+        self.log(format!("Error: {message}"));
         self.last_error = Some(message);
     }
 
@@ -146,13 +162,7 @@ impl Driver {
     pub fn status(&self) -> Status {
         let stats = self.engine.stats();
         Status {
-            state: match self.engine.state() {
-                State::Idle => "idle",
-                State::Casting => "casting",
-                State::Waiting => "waiting",
-                State::Reeling => "reeling",
-                State::Paused => "paused",
-            },
+            state: state_name(self.engine.state()),
             casts: stats.casts,
             bites: stats.bites,
             timeouts: stats.timeouts,
@@ -196,10 +206,28 @@ impl Driver {
 
     fn feed(&mut self, event: Event) {
         let now = self.now();
+        let (before, resyncs) = (self.engine.state(), self.engine.stats().resyncs);
         for action in self.engine.step(event, now) {
             match action {
                 Action::RightClick => self.click(now),
             }
+        }
+        let after = self.engine.state();
+        if self.engine.stats().resyncs > resyncs {
+            self.log("Bobber state corrected to match the game");
+        }
+        if after != before {
+            self.log(format!(
+                "State: {} -> {}",
+                state_name(before),
+                state_name(after)
+            ));
+        }
+    }
+
+    fn log(&self, text: impl Into<String>) {
+        if let Ok(mut log) = self.log.lock() {
+            log.add(text);
         }
     }
 
@@ -211,6 +239,7 @@ impl Driver {
         match result {
             Ok(()) => self.last_error = None,
             Err(message) => {
+                self.log(format!("Right click not sent: {message}"));
                 self.last_error = Some(message);
                 self.engine.input_failed(now);
             }
@@ -219,6 +248,7 @@ impl Driver {
 
     fn track_game(&mut self) {
         if self.game.as_ref().is_some_and(|g| !g.is_alive()) {
+            self.log("Minecraft window closed");
             self.game = None;
             self.capture = None;
             self.set_plan(None);
@@ -231,6 +261,9 @@ impl Driver {
         self.last_find = Some(Instant::now());
         if self.game.is_none() {
             self.game = find_game_window();
+            if let Some(game) = &self.game {
+                self.log(format!("Found {:?} Edition: {}", game.edition, game.title));
+            }
             let plan = self.game.as_ref().map(|g| plan_for(g.edition));
             self.set_plan(plan);
         }
@@ -240,7 +273,10 @@ impl Driver {
                     self.fps_mark = (Instant::now(), 0);
                     self.capture = Some(capture);
                 }
-                Err(e) => self.last_error = Some(format!("screen capture failed: {e}")),
+                Err(e) => {
+                    self.log(format!("Screen capture failed: {e}"));
+                    self.last_error = Some(format!("screen capture failed: {e}"));
+                }
             }
         }
     }
@@ -295,5 +331,15 @@ fn plan_for(edition: Edition) -> Plan {
                 ocr_languages,
             }
         }
+    }
+}
+
+fn state_name(state: State) -> &'static str {
+    match state {
+        State::Idle => "idle",
+        State::Casting => "casting",
+        State::Waiting => "waiting",
+        State::Reeling => "reeling",
+        State::Paused => "paused",
     }
 }

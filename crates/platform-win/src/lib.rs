@@ -5,13 +5,16 @@
 //! - [`hotkey::spawn`]: global start/stop hotkey via `RegisterHotKey` (no keyboard hook)
 //! - [`capture::Capture`]: Windows.Graphics.Capture of the game window's subtitle area
 //! - [`ocr::Ocr`]: Windows.Media.Ocr for the vanilla Java bite caption
+//! - [`shell`]: open a link, `.mcpack` or folder the way a double-click would
 #![cfg(windows)]
 #![warn(clippy::undocumented_unsafe_blocks)]
 
 pub mod capture;
+pub mod clock;
 pub mod hotkey;
 mod input;
 pub mod ocr;
+pub mod shell;
 mod window;
 
 pub use input::{InputError, right_click};

@@ -75,7 +75,7 @@ export function demoBackend(): Backend {
   add("App Preview started");
   return {
     kind: "preview",
-    appInfo: async () => ({ version: "0.1.0" }),
+    appInfo: async () => ({ version: __APP_VERSION__ }),
     status: async () => snapshot(),
     start: async () => {
       if (state === "idle" || state === "paused") {

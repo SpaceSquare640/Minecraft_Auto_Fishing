@@ -20,7 +20,11 @@ use tauri::Manager;
 const TICK: Duration = Duration::from_millis(50);
 
 /// Fixed link targets: the UI can only pick one by name, never pass a URL.
-const LINKS: [(&str, &str); 3] = [
+const LINKS: [(&str, &str); 4] = [
+    (
+        "releases",
+        "https://github.com/SpaceSquare640/Minecraft_Auto_Fishing/releases",
+    ),
     (
         "github",
         "https://github.com/SpaceSquare640/Minecraft_Auto_Fishing",

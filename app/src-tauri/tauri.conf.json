@@ -14,10 +14,10 @@
       {
         "label": "main",
         "title": "Minecraft Auto Fishing",
-        "width": 420,
-        "height": 560,
-        "minWidth": 360,
-        "minHeight": 480
+        "width": 480,
+        "height": 720,
+        "minWidth": 400,
+        "minHeight": 560
       }
     ],
     "security": {

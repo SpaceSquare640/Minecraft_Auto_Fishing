@@ -7,26 +7,107 @@
     <script type="module" src="/src/main.ts"></script>
   </head>
   <body>
-    <main class="panel">
-      <h1>Minecraft Auto Fishing</h1>
-      <p class="state">State: <strong id="state">idle</strong></p>
-      <p id="hint" class="hint" aria-live="polite"></p>
-      <div class="buttons">
-        <button id="start" type="button">Start</button>
-        <button id="stop" type="button" class="secondary">Stop</button>
+    <header class="top">
+      <img class="top__icon" src="/src/assets/icon.webp" alt="" width="40" height="40">
+      <div>
+        <h1 class="top__title">Minecraft Auto Fishing</h1>
+        <p class="top__version" id="version"></p>
       </div>
-      <dl class="stats">
-        <dt>Game</dt><dd id="game">Not found</dd>
-        <dt>Focus</dt><dd id="focus">Not in game</dd>
-        <dt>Capture</dt><dd id="fps">-</dd>
-        <dt>Detection</dt><dd id="detection">-</dd>
-        <dt>Last bite</dt><dd id="last-bite">-</dd>
-        <dt>Casts</dt><dd id="casts">0</dd>
-        <dt>Bites</dt><dd id="bites">0</dd>
-        <dt>Timeouts</dt><dd id="timeouts">0</dd>
-      </dl>
-      <p id="error" class="error" role="alert" hidden></p>
-      <p id="build" class="note"></p>
+    </header>
+
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab" role="tab" id="tab-fishing" aria-controls="panel-fishing" aria-selected="true" data-i18n="tabs.fishing"></button>
+      <button class="tab" role="tab" id="tab-setup" aria-controls="panel-setup" aria-selected="false" tabindex="-1" data-i18n="tabs.setup"></button>
+      <button class="tab" role="tab" id="tab-settings" aria-controls="panel-settings" aria-selected="false" tabindex="-1" data-i18n="tabs.settings"></button>
+      <button class="tab" role="tab" id="tab-about" aria-controls="panel-about" aria-selected="false" tabindex="-1" data-i18n="tabs.about"></button>
+    </nav>
+
+    <main>
+      <section class="panel" role="tabpanel" id="panel-fishing" aria-labelledby="tab-fishing">
+        <p class="state"><span data-i18n="state.label"></span>: <strong id="state"></strong></p>
+        <p class="hint" id="hint" aria-live="polite"></p>
+        <div class="buttons">
+          <button class="btn" id="start" type="button" data-i18n="fishing.start"></button>
+          <button class="btn btn--secondary" id="stop" type="button" data-i18n="fishing.stop"></button>
+        </div>
+        <p class="error" id="error" role="alert" hidden></p>
+        <dl class="grid">
+          <dt data-i18n="fishing.casts"></dt><dd id="casts">0</dd>
+          <dt data-i18n="fishing.bites"></dt><dd id="bites">0</dd>
+          <dt data-i18n="fishing.timeouts"></dt><dd id="timeouts">0</dd>
+          <dt data-i18n="fishing.resyncs"></dt><dd id="resyncs">0</dd>
+        </dl>
+        <dl class="details">
+          <dt data-i18n="fishing.game"></dt><dd id="game"></dd>
+          <dt data-i18n="fishing.focus"></dt><dd id="focus"></dd>
+          <dt data-i18n="fishing.capture"></dt><dd id="fps"></dd>
+          <dt data-i18n="fishing.detection"></dt><dd id="detection"></dd>
+          <dt data-i18n="fishing.lastBite"></dt><dd id="last-bite"></dd>
+        </dl>
+        <h2 class="subhead" data-i18n="fishing.events"></h2>
+        <ol class="events" id="events" aria-live="off"></ol>
+      </section>
+
+      <section class="panel" role="tabpanel" id="panel-setup" aria-labelledby="tab-setup" hidden>
+        <h2 class="subhead" data-i18n="setup.title"></h2>
+        <p id="setup-common"></p>
+        <h3 data-i18n="setup.java"></h3>
+        <ul class="steps">
+          <li data-i18n="setup.java1"></li>
+          <li data-i18n="setup.java2"></li>
+        </ul>
+        <button class="btn btn--secondary" id="install-java" type="button" data-i18n="setup.javaInstall"></button>
+        <h3 data-i18n="setup.bedrock"></h3>
+        <ul class="steps">
+          <li data-i18n="setup.bedrock1"></li>
+          <li data-i18n="setup.bedrock2"></li>
+          <li id="setup-bedrock3"></li>
+        </ul>
+        <button class="btn" id="install-bedrock" type="button" data-i18n="setup.bedrockInstall"></button>
+        <p class="note" id="pack-result" role="status"></p>
+      </section>
+
+      <section class="panel" role="tabpanel" id="panel-settings" aria-labelledby="tab-settings" hidden>
+        <label class="toggle"><input type="checkbox" id="save-logs"> <span data-i18n="settings.saveLogs"></span></label>
+        <p class="note" data-i18n="settings.saveLogsHelp"></p>
+        <button class="btn btn--secondary" id="open-logs" type="button" data-i18n="settings.openLogs"></button>
+        <label class="toggle"><input type="checkbox" id="check-updates"> <span data-i18n="settings.checkUpdates"></span></label>
+        <p class="note" data-i18n="settings.checkUpdatesHelp"></p>
+        <p class="note" id="settings-result" role="status"></p>
+      </section>
+
+      <section class="panel" role="tabpanel" id="panel-about" aria-labelledby="tab-about" hidden>
+        <p id="about-version"></p>
+        <div class="buttons">
+          <button class="btn btn--secondary" id="check-now" type="button" data-i18n="about.checkNow"></button>
+          <button class="btn" id="download" type="button" data-i18n="about.download" hidden></button>
+        </div>
+        <p id="update-result" role="status"></p>
+        <div class="buttons buttons--links">
+          <button class="btn btn--secondary" type="button" data-link="github" data-i18n="about.github"></button>
+          <button class="btn btn--secondary" type="button" data-link="discord" data-i18n="about.discord"></button>
+          <button class="btn btn--secondary" type="button" data-link="website" data-i18n="about.website"></button>
+        </div>
+        <p class="note" data-i18n="about.license"></p>
+      </section>
     </main>
+
+    <footer class="build" id="build"></footer>
+
+    <dialog id="intro" aria-labelledby="intro-title">
+      <h2 id="intro-title" data-i18n="intro.title"></h2>
+      <p data-i18n="intro.body1"></p>
+      <p data-i18n="intro.body2"></p>
+      <p data-i18n="intro.body3"></p>
+      <button class="btn" id="intro-ok" type="button" data-i18n="intro.ok"></button>
+    </dialog>
+
+    <dialog id="confirm" aria-labelledby="confirm-text">
+      <p id="confirm-text"></p>
+      <div class="buttons">
+        <button class="btn" id="confirm-yes" type="button" data-i18n="dialog.yes"></button>
+        <button class="btn btn--secondary" id="confirm-no" type="button" data-i18n="dialog.no"></button>
+      </div>
+    </dialog>
   </body>
 </html>

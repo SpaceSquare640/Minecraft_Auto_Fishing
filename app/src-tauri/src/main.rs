@@ -5,6 +5,7 @@ mod detect;
 mod driver;
 mod eventlog;
 mod packs;
+mod paths;
 mod settings;
 
 use std::sync::{Arc, Mutex, MutexGuard};

@@ -1,5 +1,5 @@
 //! Event log: the last events in memory for the UI, and - only when the player turns it on -
-//! one file per day in `%LOCALAPPDATA%\Minecraft Auto Fishing\logs\`, kept for 7 days.
+//! one file per day in `%LOCALAPPDATA%\<identifier>\logs\` (see [`crate::paths`]), kept for 7 days.
 //! Only app events are logged: no keystrokes, screen images or audio.
 use std::collections::VecDeque;
 use std::fs::{self, OpenOptions};
@@ -49,11 +49,7 @@ impl EventLog {
     }
 
     pub fn dir() -> Option<PathBuf> {
-        Some(
-            PathBuf::from(std::env::var_os("LOCALAPPDATA")?)
-                .join("Minecraft Auto Fishing")
-                .join("logs"),
-        )
+        Some(crate::paths::local_dir()?.join("logs"))
     }
 
     /// Turning saving on also writes the events of this session that are still in memory.

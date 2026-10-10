@@ -2,7 +2,9 @@
 
 All notable changes to the Minecraft Auto Fishing tool are documented here.
 
-## Unreleased
+## 0.1.0-alpha.2 — 2026-10-10 (test pre-release, Windows)
+
+Second test build of the Windows app, for testing only. Download it from [GitHub Releases](https://github.com/SpaceSquare640/Minecraft_Auto_Fishing/releases). The installer is not code-signed yet, so Windows SmartScreen or Microsoft Defender may warn you.
 
 - Bedrock Edition: the first cast after you return to the game (for example after closing the pause menu with Esc) should no longer be missed (not verified in game yet). Bedrock ignores the first mouse button event after its window gets the focus back, so the app first sends a mouse release that does nothing in the game, and it waits half a second after F8 — 2026-10-10
 - The Windows installer shows the app icon instead of the default installer icon — 2026-10-10

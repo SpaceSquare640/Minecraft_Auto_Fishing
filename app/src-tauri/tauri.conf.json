@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Minecraft Auto Fishing",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "identifier": "io.github.spacesquare640.minecraftautofishing",
   "build": {
     "frontendDist": "../dist",

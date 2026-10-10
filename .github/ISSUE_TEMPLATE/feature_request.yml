@@ -1,0 +1,43 @@
+name: Feature request
+description: Suggest an idea or improvement for the tool.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea! The tool runs outside the game and does not try to hide from
+        server anti-cheat, so requests in that direction will be closed.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe the situation, not only the solution.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+  - type: checkboxes
+    id: editions
+    attributes:
+      label: Which editions does it concern?
+      options:
+        - label: Java Edition
+        - label: Bedrock Edition
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched the existing issues and this is not a duplicate.
+          required: true
+        - label: This is not a request to bypass server rules or anti-cheat.
+          required: true

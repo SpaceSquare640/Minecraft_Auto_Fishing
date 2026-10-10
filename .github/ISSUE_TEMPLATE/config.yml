@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and help (Discord)
+    url: https://discord.gg/aaUQVJeCgC
+    about: Ask the community, share tips and get help with setup.
+  - name: Documentation
+    url: https://spacesquare640.github.io/Minecraft_Auto_Fishing/docs.html
+    about: How the tool works, supported editions and FAQ.
+  - name: Report a security vulnerability
+    url: https://github.com/SpaceSquare640/Minecraft_Auto_Fishing/security/advisories/new
+    about: Please report security problems privately, not as a public issue.

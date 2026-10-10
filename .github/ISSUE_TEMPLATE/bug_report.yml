@@ -1,0 +1,87 @@
+name: Bug report
+description: Something in the tool does not work as expected.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a problem.
+        For questions and setup help, the Discord community is usually faster.
+        Security problems: please use "Report a security vulnerability" instead of a public issue.
+  - type: dropdown
+    id: edition
+    attributes:
+      label: Minecraft edition
+      options:
+        - Java Edition
+        - Bedrock Edition
+    validations:
+      required: true
+  - type: input
+    id: game-version
+    attributes:
+      label: Minecraft version
+      placeholder: e.g. 26.3
+  - type: input
+    id: app-version
+    attributes:
+      label: App version
+      description: Shown in the app window.
+      placeholder: e.g. 0.1.0
+    validations:
+      required: true
+  - type: input
+    id: windows-version
+    attributes:
+      label: Windows version
+      placeholder: e.g. Windows 11 24H2
+    validations:
+      required: true
+  - type: dropdown
+    id: detection
+    attributes:
+      label: Bite detection
+      options:
+        - Subtitles (no resource pack)
+        - Bite Caption resource pack
+        - Not sure
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Also describe what you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log
+      description: >
+        If you can, turn on "Save logs to file" in the app, reproduce the problem and paste the
+        newest log file here (use "Open log folder" in the app). Logs contain only app events:
+        no keystrokes, screenshots or audio.
+      render: text
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots or anything else
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched the existing issues and this is not a duplicate.
+          required: true
+        - label: This is not a request to bypass server rules or anti-cheat.
+          required: true

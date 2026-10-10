@@ -14,3 +14,4 @@ tauri-build = { version = "=2.7.1", features = [] }
 tauri = { version = "=2.12.1", features = [] }
 serde = { version = "=1.0.229", features = ["derive"] }
 maf-engine = { path = "../../crates/engine" }
+maf-platform-win = { path = "../../crates/platform-win" }

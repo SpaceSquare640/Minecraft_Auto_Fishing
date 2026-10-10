@@ -142,6 +142,17 @@ impl Engine {
         }
     }
 
+    /// The caller could not perform the last `RightClick` (e.g. the game lost focus a moment
+    /// before sending). Undo its effect on the bobber and pause, so the next Start repeats it.
+    pub fn input_failed(&mut self, now: Duration) {
+        self.line_out = !self.line_out;
+        if !self.line_out {
+            // The failed click was a cast.
+            self.stats.casts = self.stats.casts.saturating_sub(1);
+        }
+        self.enter(State::Paused, now);
+    }
+
     fn is_running(&self) -> bool {
         matches!(self.state, State::Casting | State::Waiting | State::Reeling)
     }
@@ -319,6 +330,29 @@ mod tests {
         assert!(e.step(Event::Start, ms(2000)).is_empty());
         assert_eq!(e.state(), State::Waiting);
         assert_eq!(e.stats().casts, 1);
+    }
+
+    #[test]
+    fn failed_cast_is_undone_and_repeated_on_start() {
+        let mut e = casting();
+        e.input_failed(ms(10));
+        assert_eq!(e.state(), State::Paused);
+        assert!(!e.line_out());
+        assert_eq!(e.stats().casts, 0);
+        assert_eq!(e.step(Event::Start, ms(1000)), CLICK);
+        assert_eq!(e.state(), State::Casting);
+        assert!(e.line_out());
+    }
+
+    #[test]
+    fn failed_reel_is_undone_and_repeated_on_start() {
+        let mut e = waiting();
+        e.step(Event::Bite, ms(2000));
+        e.input_failed(ms(2001));
+        assert!(e.line_out());
+        assert_eq!(e.step(Event::Start, ms(3000)), CLICK);
+        assert_eq!(e.state(), State::Reeling);
+        assert!(!e.line_out());
     }
 
     #[test]

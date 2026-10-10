@@ -5,9 +5,10 @@ use std::sync::Arc;
 use std::sync::atomic::Ordering;
 use std::time::{Duration, Instant};
 
+use maf_detectors::subtitle::LineEvent;
 use maf_detectors::{Bite, DetectorId};
 use maf_engine::{Action, Config, Engine, Event, State};
-use maf_game_profile::{JavaProfile, ocr_language_tag};
+use maf_game_profile::{BITE_KEY, JavaProfile, RETRIEVE_KEY, THROW_KEY, ocr_language_tag};
 use maf_platform_win::capture::Capture;
 use maf_platform_win::{Edition, GameWindow, find_game_window, right_click};
 use serde::Serialize;
@@ -39,6 +40,7 @@ pub struct Status {
     casts: u32,
     bites: u32,
     timeouts: u32,
+    resyncs: u32,
     game: Option<GameInfo>,
     focused: bool,
     capture_fps: Option<f32>,
@@ -83,6 +85,14 @@ impl Driver {
     }
 
     /// A detector saw a new bite caption.
+    /// The game showed the bobber being thrown or pulled in.
+    pub fn line(&mut self, event: LineEvent) {
+        self.feed(match event {
+            LineEvent::Out => Event::LineOut,
+            LineEvent::In => Event::LineIn,
+        });
+    }
+
     pub fn bite(&mut self, bite: Bite) {
         self.last_bite = Some((bite.source, Instant::now()));
         self.feed(Event::Bite);
@@ -146,6 +156,7 @@ impl Driver {
             casts: stats.casts,
             bites: stats.bites,
             timeouts: stats.timeouts,
+            resyncs: stats.resyncs,
             game: self.game.as_ref().map(|g| GameInfo {
                 edition: match g.edition {
                     Edition::Java => "java",
@@ -256,26 +267,31 @@ impl Driver {
 }
 
 /// Bedrock: the resource pack marker only (its vanilla caption is shared with every splash).
-/// Java: the vanilla caption by OCR in the game's language, plus the marker if the pack is on.
+/// Java: the vanilla caption by OCR in the game's language, plus the marker if the pack is on,
+/// and the bobber's own captions to follow its real state.
 fn plan_for(edition: Edition) -> Plan {
     match edition {
-        Edition::Bedrock => Plan {
-            captions: Vec::new(),
-            ocr_languages: Vec::new(),
-        },
+        Edition::Bedrock => Plan::default(),
         Edition::Java => {
             let profile = JavaProfile::default_location();
             let lang = profile
                 .as_ref()
                 .and_then(JavaProfile::language)
                 .unwrap_or_else(|| "en_us".to_owned());
-            let captions = profile.map(|p| p.bite_captions(&lang)).unwrap_or_default();
+            let caption = |key| {
+                profile
+                    .as_ref()
+                    .map(|p| p.captions(key, &lang))
+                    .unwrap_or_default()
+            };
             let mut ocr_languages = vec![ocr_language_tag(&lang)];
             if lang != "en_us" {
                 ocr_languages.push("en-US".to_owned());
             }
             Plan {
-                captions,
+                bite: caption(BITE_KEY),
+                thrown: caption(THROW_KEY),
+                retrieved: caption(RETRIEVE_KEY),
                 ocr_languages,
             }
         }

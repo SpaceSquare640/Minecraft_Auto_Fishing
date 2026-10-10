@@ -40,6 +40,7 @@ export function demoBackend(): Backend {
     casts,
     bites,
     timeouts: 0,
+    resyncs: 0,
     game: { edition: "java", title: "Minecraft (preview)" },
     focused: true,
     captureFps: 60,

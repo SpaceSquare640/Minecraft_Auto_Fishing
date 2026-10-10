@@ -8,7 +8,10 @@ use std::fs;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 
-const BITE_KEY: &str = "subtitles.entity.fishing_bobber.splash";
+/// Caption keys of the fishing bobber's sounds.
+pub const BITE_KEY: &str = "subtitles.entity.fishing_bobber.splash";
+pub const THROW_KEY: &str = "subtitles.entity.fishing_bobber.throw";
+pub const RETRIEVE_KEY: &str = "subtitles.entity.fishing_bobber.retrieve";
 
 pub struct JavaProfile {
     root: PathBuf,
@@ -35,17 +38,22 @@ impl JavaProfile {
     }
 
     /// The bite caption in `lang` across every installed version (usually one string).
-    /// Falls back to English when the language has no entry.
     pub fn bite_captions(&self, lang: &str) -> Vec<String> {
-        let mut found = self.captions_from_assets(lang);
+        self.captions(BITE_KEY, lang)
+    }
+
+    /// The caption for `key` in `lang` across every installed version.
+    /// Falls back to English when the language has no entry.
+    pub fn captions(&self, key: &str, lang: &str) -> Vec<String> {
+        let mut found = self.captions_from_assets(key, lang);
         if lang == "en_us" || found.is_empty() {
-            found.extend(self.captions_from_jars());
+            found.extend(self.captions_from_jars(key));
         }
         found.into_iter().collect()
     }
 
     /// Non-English language files live in the shared asset store, referenced by hash.
-    fn captions_from_assets(&self, lang: &str) -> BTreeSet<String> {
+    fn captions_from_assets(&self, key: &str, lang: &str) -> BTreeSet<String> {
         let mut out = BTreeSet::new();
         let assets = self.root.join("assets");
         let Ok(indexes) = fs::read_dir(assets.join("indexes")) else {
@@ -62,9 +70,7 @@ impl JavaProfile {
                 continue; // never build a path from anything but a plain hash
             }
             let file = assets.join("objects").join(&hash[..2]).join(&hash);
-            if let Some(text) =
-                read_json(&file).and_then(|j| j[BITE_KEY].as_str().map(str::to_owned))
-            {
+            if let Some(text) = read_json(&file).and_then(|j| j[key].as_str().map(str::to_owned)) {
                 out.insert(text);
             }
         }
@@ -72,7 +78,7 @@ impl JavaProfile {
     }
 
     /// English ships inside each version's client jar.
-    fn captions_from_jars(&self) -> BTreeSet<String> {
+    fn captions_from_jars(&self, key: &str) -> BTreeSet<String> {
         let mut out = BTreeSet::new();
         let Ok(versions) = fs::read_dir(self.root.join("versions")) else {
             return out;
@@ -81,7 +87,7 @@ impl JavaProfile {
             let jar = version
                 .path()
                 .join(format!("{}.jar", version.file_name().to_string_lossy()));
-            if let Some(text) = english_caption_in_jar(&jar) {
+            if let Some(text) = english_caption_in_jar(&jar, key) {
                 out.insert(text);
             }
         }
@@ -93,13 +99,13 @@ fn read_json(path: &Path) -> Option<serde_json::Value> {
     serde_json::from_slice(&fs::read(path).ok()?).ok()
 }
 
-fn english_caption_in_jar(jar: &Path) -> Option<String> {
+fn english_caption_in_jar(jar: &Path, key: &str) -> Option<String> {
     let mut archive = zip::ZipArchive::new(fs::File::open(jar).ok()?).ok()?;
     let mut entry = archive.by_name("assets/minecraft/lang/en_us.json").ok()?;
     let mut bytes = Vec::new();
     entry.read_to_end(&mut bytes).ok()?;
     let json: serde_json::Value = serde_json::from_slice(&bytes).ok()?;
-    json[BITE_KEY].as_str().map(str::to_owned)
+    json[key].as_str().map(str::to_owned)
 }
 
 /// Windows OCR language tag for a Java language code: "en_us" -> "en-US",

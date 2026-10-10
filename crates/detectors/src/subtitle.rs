@@ -1,13 +1,14 @@
 //! Scheme A (Java): the vanilla bite caption ("Fishing Bobber splashes" in English) read
-//! by OCR. The caption text for the player's language comes from the game's own language
-//! files at runtime, so this crate ships no game text.
+//! by OCR, plus the bobber's own captions ("Bobber is thrown" / "Bobber is retrieved") to
+//! follow its real state. The caption text for the player's language comes from the
+//! game's language files at runtime, so this crate ships no game text.
 
 use std::time::Duration;
 
 use crate::{Bite, Detector, DetectorId, Onset};
 
-/// OCR lines at least this similar to a bite caption count as one (Phase 0: OCR misreads
-/// a letter or two; other captions are far apart).
+/// OCR lines at least this similar to a caption count as one (Phase 0: OCR misreads a
+/// letter or two; other captions are far apart).
 pub const MIN_SIMILARITY: f32 = 0.8;
 
 /// Lowercase letters and digits only: drops Java's `<` `>` arrows, spaces and punctuation.
@@ -41,14 +42,14 @@ pub fn similarity(a: &str, b: &str) -> f32 {
     1.0 - row[b.len()] as f32 / longest as f32
 }
 
+/// Watches OCR lines for one caption (in any of its wordings) and reports when it appears.
 #[derive(Debug)]
-pub struct SubtitleDetector {
+pub struct CaptionMatcher {
     captions: Vec<String>,
     onset: Onset,
 }
 
-impl SubtitleDetector {
-    /// `captions`: the bite caption in each language the game may show.
+impl CaptionMatcher {
     pub fn new<S: AsRef<str>>(captions: impl IntoIterator<Item = S>) -> Self {
         let captions = captions
             .into_iter()
@@ -68,6 +69,29 @@ impl SubtitleDetector {
             .map(|c| similarity(&line, c))
             .fold(0.0, f32::max)
     }
+
+    /// The best score when the caption newly appeared in `lines`.
+    pub fn feed(&mut self, lines: &[String], now: Duration) -> Option<f32> {
+        let best = lines.iter().map(|l| self.score(l)).fold(0.0, f32::max);
+        self.onset
+            .update(best >= MIN_SIMILARITY, now)
+            .then_some(best)
+    }
+}
+
+/// Scheme A bite detector.
+#[derive(Debug)]
+pub struct SubtitleDetector {
+    matcher: CaptionMatcher,
+}
+
+impl SubtitleDetector {
+    /// `captions`: the bite caption in each language the game may show.
+    pub fn new<S: AsRef<str>>(captions: impl IntoIterator<Item = S>) -> Self {
+        Self {
+            matcher: CaptionMatcher::new(captions),
+        }
+    }
 }
 
 impl Detector for SubtitleDetector {
@@ -79,13 +103,46 @@ impl Detector for SubtitleDetector {
     }
 
     fn feed(&mut self, lines: &[String], now: Duration) -> Option<Bite> {
-        let best = lines.iter().map(|l| self.score(l)).fold(0.0, f32::max);
-        let present = best >= MIN_SIMILARITY;
-        self.onset.update(present, now).then(|| Bite {
+        self.matcher.feed(lines, now).map(|confidence| Bite {
             at: now,
-            confidence: best,
+            confidence,
             source: self.id(),
         })
+    }
+}
+
+/// What the game showed about the bobber (Java "Bobber is thrown" / "Bobber is retrieved").
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LineEvent {
+    Out,
+    In,
+}
+
+/// Follows the bobber's real state so the app can repair a click that did the opposite of
+/// what it meant, e.g. after the game silently removed a bobber that flew too far.
+#[derive(Debug)]
+pub struct LineWatcher {
+    thrown: CaptionMatcher,
+    retrieved: CaptionMatcher,
+}
+
+impl LineWatcher {
+    pub fn new<S: AsRef<str>>(
+        thrown: impl IntoIterator<Item = S>,
+        retrieved: impl IntoIterator<Item = S>,
+    ) -> Self {
+        Self {
+            thrown: CaptionMatcher::new(thrown),
+            retrieved: CaptionMatcher::new(retrieved),
+        }
+    }
+
+    /// The newest bobber event in these lines. A reel and the next cast can show up in the
+    /// same frame; the cast happened last.
+    pub fn feed(&mut self, lines: &[String], now: Duration) -> Option<LineEvent> {
+        let retrieved = self.retrieved.feed(lines, now).map(|_| LineEvent::In);
+        let thrown = self.thrown.feed(lines, now).map(|_| LineEvent::Out);
+        thrown.or(retrieved)
     }
 }
 
@@ -108,12 +165,12 @@ mod tests {
 
     #[test]
     fn ocr_misreads_still_match_but_other_captions_do_not() {
-        let d = SubtitleDetector::new(["Fishing Bobber splashes"]);
-        assert!(d.score("Fishing Bobber splashes >") > 0.99);
-        assert!(d.score("Fishing Bobber spIashes") >= MIN_SIMILARITY);
-        assert!(d.score("Splashing") < MIN_SIMILARITY);
-        assert!(d.score("Bobber is retrieved") < MIN_SIMILARITY);
-        assert!(d.score("Experience gained") < MIN_SIMILARITY);
+        let m = CaptionMatcher::new(["Fishing Bobber splashes"]);
+        assert!(m.score("Fishing Bobber splashes >") > 0.99);
+        assert!(m.score("Fishing Bobber spIashes") >= MIN_SIMILARITY);
+        assert!(m.score("Splashing") < MIN_SIMILARITY);
+        assert!(m.score("Bobber is retrieved") < MIN_SIMILARITY);
+        assert!(m.score("Experience gained") < MIN_SIMILARITY);
     }
 
     #[test]
@@ -126,5 +183,24 @@ mod tests {
             .expect("bite");
         assert_eq!(bite.source, DetectorId::SubtitleOcr);
         assert!(d.feed(&lines(&["浮標濺水聲"]), ms(200)).is_none());
+    }
+
+    #[test]
+    fn bobber_events_are_told_apart() {
+        let mut w = LineWatcher::new(["Bobber is thrown"], ["Bobber is retrieved"]);
+        let ms = Duration::from_millis;
+        assert_eq!(
+            w.feed(&lines(&["Bobber is thrown >"]), ms(0)),
+            Some(LineEvent::Out)
+        );
+        assert_eq!(w.feed(&lines(&["Bobber is thrown"]), ms(100)), None);
+        assert_eq!(
+            w.feed(
+                &lines(&["Bobber is thrown", "< Bobber is retrieved"]),
+                ms(200)
+            ),
+            Some(LineEvent::In)
+        );
+        assert_eq!(w.feed(&lines(&["Fishing Bobber splashes"]), ms(300)), None);
     }
 }

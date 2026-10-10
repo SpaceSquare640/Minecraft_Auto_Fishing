@@ -54,8 +54,13 @@ fn main() {
             std::thread::Builder::new()
                 .name("maf-detect".into())
                 .spawn(move || {
-                    detect::run(detection, move |bite| {
-                        on_bite.state::<AppState>().driver().bite(bite)
+                    detect::run(detection, move |seen| {
+                        let state = on_bite.state::<AppState>();
+                        let mut driver = state.driver();
+                        match seen {
+                            detect::Seen::Bite(bite) => driver.bite(bite),
+                            detect::Seen::Line(event) => driver.line(event),
+                        }
                     })
                 })?;
 

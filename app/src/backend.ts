@@ -10,6 +10,7 @@ export interface Status {
   casts: number;
   bites: number;
   timeouts: number;
+  resyncs: number;
   game: { edition: "java" | "bedrock"; title: string } | null;
   focused: boolean;
   captureFps: number | null;

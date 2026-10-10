@@ -10,7 +10,8 @@ use std::time::Duration;
 /// Timing rules.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Config {
-    /// Bites are ignored this long after a cast (cast splash, captions still on screen).
+    /// Bites are ignored this long after a cast: the bobber is still flying, and a Java
+    /// caption from the previous bite stays on screen for up to 3 s while it fades.
     pub settle: Duration,
     /// No bite for this long: reel in and cast again (also rescues bites too far away to hear).
     pub bite_timeout: Duration,
@@ -21,7 +22,7 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            settle: Duration::from_millis(1500),
+            settle: Duration::from_millis(3000),
             bite_timeout: Duration::from_secs(45),
             recast_delay: Duration::from_millis(600),
         }
@@ -48,6 +49,10 @@ pub enum Event {
     Stop,
     /// A detector reported a bite.
     Bite,
+    /// The game showed that the bobber was just thrown (Java "Bobber is thrown").
+    LineOut,
+    /// The game showed that the bobber was just pulled in (Java "Bobber is retrieved").
+    LineIn,
     FocusLost,
     FocusGained,
     /// Periodic clock tick.
@@ -65,6 +70,8 @@ pub struct Stats {
     pub casts: u32,
     pub bites: u32,
     pub timeouts: u32,
+    /// Times the game showed a different bobber state than expected.
+    pub resyncs: u32,
 }
 
 #[derive(Debug)]
@@ -124,6 +131,29 @@ impl Engine {
                 vec![]
             }
             (Event::Start, State::Idle | State::Paused) => self.resume(now),
+            // The game disagrees with our belief: follow the game. This repairs a click that
+            // did the opposite of what we meant, e.g. after the game removed the bobber.
+            (Event::LineIn, State::Casting | State::Waiting) => {
+                self.line_out = false;
+                self.stats.resyncs += 1;
+                self.enter(State::Reeling, now);
+                vec![]
+            }
+            (Event::LineOut, State::Reeling) => {
+                self.line_out = true;
+                self.stats.resyncs += 1;
+                self.enter(State::Casting, now);
+                vec![]
+            }
+            // While stopped or paused, just remember where the bobber is.
+            (Event::LineIn, State::Idle | State::Paused) => {
+                self.line_out = false;
+                vec![]
+            }
+            (Event::LineOut, State::Idle | State::Paused) => {
+                self.line_out = true;
+                vec![]
+            }
             (Event::Bite, State::Waiting) => {
                 self.stats.bites += 1;
                 self.reel(now)
@@ -260,7 +290,8 @@ mod tests {
             Stats {
                 casts: 2,
                 bites: 1,
-                timeouts: 0
+                timeouts: 0,
+                resyncs: 0
             }
         );
     }
@@ -285,7 +316,8 @@ mod tests {
             Stats {
                 casts: 2,
                 bites: 0,
-                timeouts: 1
+                timeouts: 1,
+                resyncs: 0
             }
         );
     }
@@ -353,6 +385,52 @@ mod tests {
         assert_eq!(e.step(Event::Start, ms(3000)), CLICK);
         assert_eq!(e.state(), State::Reeling);
         assert!(!e.line_out());
+    }
+
+    #[test]
+    fn bobber_removed_by_the_game_is_repaired_at_the_timeout() {
+        // The game silently removed the bobber; we still believe it is out.
+        let mut e = waiting();
+        assert_eq!(e.step(Event::Tick, ms(11_000)), CLICK); // "reel" - really a cast
+        assert_eq!(e.state(), State::Reeling);
+        assert!(e.step(Event::LineOut, ms(11_200)).is_empty()); // "Bobber is thrown"
+        assert_eq!(e.state(), State::Casting);
+        assert!(e.line_out());
+        assert!(e.step(Event::Tick, ms(11_800)).is_empty()); // no recast click
+        assert!(e.step(Event::Tick, ms(14_200)).is_empty());
+        assert_eq!(e.state(), State::Waiting);
+        assert_eq!(e.stats().resyncs, 1);
+    }
+
+    #[test]
+    fn cast_that_pulled_the_bobber_in_is_repeated() {
+        let mut e = casting();
+        assert!(e.step(Event::LineIn, ms(200)).is_empty()); // "Bobber is retrieved"
+        assert_eq!(e.state(), State::Reeling);
+        assert!(!e.line_out());
+        assert_eq!(e.step(Event::Tick, ms(800)), CLICK); // cast again
+        assert_eq!(e.state(), State::Casting);
+    }
+
+    #[test]
+    fn expected_bobber_events_change_nothing() {
+        let mut e = casting();
+        assert!(e.step(Event::LineOut, ms(200)).is_empty());
+        assert_eq!(e.state(), State::Casting);
+        e.step(Event::Tick, ms(1000));
+        e.step(Event::Bite, ms(2000));
+        assert!(e.step(Event::LineIn, ms(2100)).is_empty());
+        assert_eq!(e.state(), State::Reeling);
+        assert_eq!(e.stats().resyncs, 0);
+    }
+
+    #[test]
+    fn manual_cast_while_paused_is_remembered() {
+        let mut e = Engine::new(cfg());
+        e.step(Event::FocusGained, ms(0));
+        e.step(Event::LineOut, ms(100)); // player cast by hand before starting
+        assert_eq!(e.step(Event::Start, ms(200)), CLICK);
+        assert_eq!(e.state(), State::Reeling); // so the first click reels in
     }
 
     #[test]

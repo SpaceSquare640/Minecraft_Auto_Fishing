@@ -101,6 +101,19 @@ async function checkPages() {
   });
 }
 
+// The App Preview (app-preview/) is not built by scripts/build.js: check it loads with its own CSP.
+async function checkAppPreview() {
+  await check("/app-preview/", async () => {
+    const { status, text } = await site("app-preview/");
+    if (status !== 200) return errors.push(`/app-preview/ → HTTP ${status}`);
+    if (!/<meta http-equiv="Content-Security-Policy"/.test(text)) errors.push("/app-preview/: CSP meta missing");
+    for (const m of text.matchAll(/\s(?:href|src)="\.\/(assets\/[^"]+)"/g)) {
+      const res = await site(`app-preview/${m[1]}`, { method: "HEAD" });
+      if (res.status !== 200) errors.push(`/app-preview/ → ${m[1]} HTTP ${res.status}`);
+    }
+  });
+}
+
 async function checkExternal() {
   for (const url of EXTERNAL) {
     try {
@@ -126,6 +139,7 @@ async function checkExternal() {
 (async () => {
   if (MODE === "deploy") await waitForVersion();
   await checkPages();
+  await checkAppPreview();
   if (MODE === "health") await checkExternal();
   for (const w of warnings) console.log(`⚠ ${w}`);
   if (errors.length) { console.error(`✖ ${errors.length} problem(s):\n  - ${errors.join("\n  - ")}`); process.exit(1); }

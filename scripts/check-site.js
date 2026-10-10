@@ -5,6 +5,7 @@
 // 2. every local file referenced by HTML (href/src) and CSS (url()) exists
 // 3. every in-page / cross-page #anchor exists
 // 4. CSP compliance: each page has a CSP meta tag, no inline <script>/<style>, no style="" attributes
+// 5. app-preview/ (copied by scripts/sync-app-preview.js): CSP, no inline code, every referenced file exists
 "use strict";
 const fs = require("fs");
 const path = require("path");
@@ -14,7 +15,7 @@ const ROOT = path.resolve(__dirname, "..");
 const PAGES = ["index.html", "docs.html", "changelog.html", "404.html"];
 const BASE = "/Minecraft_Auto_Fishing/";
 // must match INCLUDE in scripts/build.js
-const PUBLISHED = ["index.html", "docs.html", "changelog.html", "404.html", "sitemap.xml", "LICENSE", "css", "js", "locales", "assets"];   // absolute paths (used by 404.html) map to the repo root
+const PUBLISHED = ["index.html", "docs.html", "changelog.html", "404.html", "sitemap.xml", "LICENSE", "css", "js", "locales", "assets", "app-preview"];   // absolute paths (used by 404.html) map to the repo root
 const errors = [];
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), "utf8");
 const exists = (rel) => fs.existsSync(path.join(ROOT, rel));
@@ -65,6 +66,30 @@ for (const page of PAGES) {
     const target = file === "" ? page : (file === "./" ? "index.html" : file);
     if (file !== "" && !exists(target)) { errors.push(`${page}: broken reference "${ref}"`); continue; }
     if (hash && ids[target] && !ids[target].has(hash)) errors.push(`${page}: missing anchor "${ref}"`);
+  }
+}
+
+// --- App Preview: built by Vite in Source_Code, copied here by scripts/sync-app-preview.js --------
+// It has its own i18n, so only the CSP rules and file references are checked.
+{
+  const page = "app-preview/index.html";
+  if (!exists(page)) errors.push(`${page}: missing (run scripts/sync-app-preview.js)`);
+  else {
+    const html = read(page);
+    if (!/<meta http-equiv="Content-Security-Policy"/.test(html)) errors.push(`${page}: no CSP meta tag (build it with npm run build:preview)`);
+    if (/<script(?![^>]*\ssrc=)[^>]*>/.test(html)) errors.push(`${page}: inline <script> (blocked by CSP)`);
+    if (/<style[\s>]/.test(html)) errors.push(`${page}: inline <style> (blocked by CSP)`);
+    if (/\sstyle="/.test(html)) errors.push(`${page}: style="" attribute (blocked by CSP)`);
+    const refs = [...html.matchAll(/\s(?:href|src)="([^"]+)"/g)].map((m) => ["app-preview", m[1]]);
+    for (const name of fs.readdirSync(path.join(ROOT, "app-preview/assets")).filter((n) => n.endsWith(".css"))) {
+      for (const m of read(`app-preview/assets/${name}`).matchAll(/url\(\s*["']?([^"')]+)["']?\s*\)/g)) refs.push(["app-preview/assets", m[1]]);
+    }
+    for (const [base, ref] of refs) {
+      if (/^(https?:|data:)/.test(ref)) { errors.push(`${base}: external reference ${ref}`); continue; }
+      const target = path.posix.normalize(`${base}/${ref.split(/[?#]/)[0]}`);
+      if (!target.startsWith("app-preview/")) { errors.push(`${base}: reference outside app-preview/ "${ref}"`); continue; }
+      if (!exists(target)) errors.push(`${base}: broken reference "${ref}"`);
+    }
   }
 }
 

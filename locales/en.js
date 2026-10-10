@@ -59,6 +59,12 @@ window.LOCALES.en = {
       open: { title: "Open source", text: "Free to read, change and share under GPL-3.0." }
     }
   },
+  appPreview: {
+    title: "App preview",
+    lead: "This is the real app interface, running on a simulated game: try Start, the tabs and the settings. Nothing is installed and no clicks are sent anywhere.",
+    frameTitle: "Minecraft Auto Fishing app preview",
+    open: "Open the app preview in a full page"
+  },
   start: {
     title: "Getting started",
     text: "A test build for Windows is available on GitHub Releases, and setup steps are in the Docs. The installer is not code-signed yet, so Windows may show a warning. Join the community on Discord for updates and questions.",

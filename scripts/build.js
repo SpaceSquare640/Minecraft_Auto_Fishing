@@ -15,7 +15,8 @@ const vm = require("vm");
 
 const ROOT = path.resolve(__dirname, "..");
 const OUT = path.join(ROOT, "_site");
-const INCLUDE = ["index.html", "docs.html", "changelog.html", "404.html", "sitemap.xml", "LICENSE", "css", "js", "locales", "assets"];
+// app-preview/ is the Vite build of the app UI: its file names are already content-hashed.
+const INCLUDE = ["index.html", "docs.html", "changelog.html", "404.html", "sitemap.xml", "LICENSE", "css", "js", "locales", "assets", "app-preview"];
 const PAGES = ["index.html", "docs.html", "changelog.html", "404.html"];
 const HASHED_DIRS = ["css", "js", "locales"];
 

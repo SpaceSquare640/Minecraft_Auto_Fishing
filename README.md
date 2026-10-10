@@ -26,7 +26,8 @@ contain inline `<script>`, `<style>` or `style` attributes (`scripts/check-site.
 
 | Page | Content |
 |---|---|
-| `index.html` | Landing page: hero, interactive fishing demo (manual vs. auto), how it works, features, getting started, FAQ |
+| `index.html` | Landing page: hero, interactive fishing demo (manual vs. auto), app preview, how it works, features, getting started, FAQ |
+| `app-preview/` | The real app UI on a simulated backend, built by Vite in `Source_Code` and embedded in `index.html` |
 | `docs.html` | Renders `docs/overview.md` from the `Source_Code` branch |
 | `changelog.html` | Renders the tool's `Change Log.md` (`Source_Code`) and this branch's `Change Log.md` |
 | `404.html` | Custom "page not found" page; GitHub Pages serves it for any unknown URL, so it uses absolute `/Minecraft_Auto_Fishing/...` paths |
@@ -64,6 +65,7 @@ scripts/
   build.js          Builds _site/ for Pages: prerenders English text, content-hashes CSS/JS file names
   carry-over.js     CI only: keeps the previous deploy's hashed CSS/JS so cached older pages still work
   smoke-test.js     Live checks of the deployed site (deploy / weekly health modes)
+  sync-app-preview.js  Local only: copies the App Preview build from Source_Code into app-preview/
 .github/workflows/
   pages.yml         Test -> build -> deploy -> verify (GitHub Pages)
   codeql.yml        CodeQL scanning of the site JS and the workflows
@@ -74,8 +76,25 @@ assets/img/
   og-image.png          1200x630 social preview (Open Graph / Twitter)
 assets/fonts/
   PressStart2P-*.woff2, OFL.txt
+app-preview/
+  index.html, assets/   App Preview build from Source_Code (do not edit; run scripts/sync-app-preview.js)
 sitemap.xml
 ```
+
+### Updating the App Preview
+
+The App Preview is the app's own UI with a simulated backend (`app/src/demo-backend.ts` in `Source_Code`).
+CI does not build it, because this branch installs no packages. After changing the app UI:
+
+```bash
+# in Source_Code/app
+npm run build:preview
+# in this branch
+node scripts/sync-app-preview.js ../Source_Code/app/dist-preview
+node scripts/check-site.js
+```
+
+`build:preview` adds a CSP meta tag to the page; the sync script refuses a build without it.
 
 ## Preview locally
 

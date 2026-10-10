@@ -58,6 +58,18 @@
 .start__actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-4); }
 .start__actions .btn-github svg { color: #fff; }
 
+/* ---------- App preview ---------- */
+.app-frame {
+  margin-top: var(--space-4);
+  width: min(100%, 488px);
+  border: var(--border-pixel) solid var(--color-wood);
+  background: var(--color-bg);
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.35);
+}
+.app-frame__view { display: block; width: 100%; height: 720px; border: 0; }
+.app-frame__open { margin-top: var(--space-3); }
+@media (max-width: 520px) { .app-frame__view { height: 640px; } }
+
 /* ---------- FAQ ---------- */
 .faq { display: grid; gap: var(--space-2); margin-top: var(--space-4); max-width: 72ch; }
 .faq__item { background: var(--color-surface); border-left: var(--border-pixel) solid var(--color-wood); }

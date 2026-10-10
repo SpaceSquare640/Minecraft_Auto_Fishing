@@ -108,3 +108,9 @@ All notable changes to the website branch are recorded here.
 ## 2026-10-10 (Test build)
 
 - Getting started now has a "Download test build (Windows)" button linking to GitHub Releases (0.1.0-alpha.1) and says the installer is not code-signed yet; the FAQ answer about releases is updated — Content
+
+## 2026-10-10 (App preview)
+
+- Added an "App preview" section to the home page: the real app interface, running on the simulated backend, in an embedded window with a link to open it as a full page — Content
+- Added `app-preview/` (Vite build of the app UI from `Source_Code`, with its own CSP) and `scripts/sync-app-preview.js` to copy it; the home page CSP allows framing this site only (`frame-src 'self'`) — Website
+- `check-site.js` checks the App Preview's CSP and file references; `smoke-test.js` checks it loads on the live site; `build.js` publishes it — CI/CD

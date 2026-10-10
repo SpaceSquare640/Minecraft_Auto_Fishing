@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self' https://raw.githubusercontent.com/SpaceSquare640/Minecraft_Auto_Fishing/; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self' https://raw.githubusercontent.com/SpaceSquare640/Minecraft_Auto_Fishing/; frame-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title data-i18n="meta.title">Minecraft Auto Fishing</title>
   <meta name="description" content="An open-source auto-fishing tool in development for Minecraft: Java Edition (Windows, macOS, Linux) and Bedrock Edition (Windows). It runs outside the game and is not a mod.">
@@ -202,6 +202,19 @@
           <ol class="demo__log" data-demo-log></ol>
         </div>
         <div class="visually-hidden" aria-live="polite" data-demo-announcer></div>
+      </div>
+    </section>
+
+    <section id="app-preview" class="section" aria-labelledby="app-preview-title">
+      <div class="container">
+        <h2 id="app-preview-title" class="section__title" data-i18n="appPreview.title"></h2>
+        <p class="section__lead" data-i18n="appPreview.lead"></p>
+        <div class="app-frame">
+          <iframe class="app-frame__view" src="app-preview/" width="480" height="720" loading="lazy" data-i18n-attr="title:appPreview.frameTitle"></iframe>
+        </div>
+        <p class="app-frame__open">
+          <a href="app-preview/" target="_blank" rel="noopener noreferrer"><span data-i18n="appPreview.open"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span></a>
+        </p>
       </div>
     </section>
 

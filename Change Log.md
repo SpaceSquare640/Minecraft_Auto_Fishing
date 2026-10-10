@@ -104,3 +104,7 @@ All notable changes to the website branch are recorded here.
 
 - Added issue forms on `Source_Code` (`.github/ISSUE_TEMPLATE/`): bug report and feature request; blank issues are off and the issue chooser links to Discord, the documentation and private security reporting — Repository
 - Added a Sponsor button (`Source_Code`: `.github/FUNDING.yml`) with Buy Me a Coffee and PayPal — Repository
+
+## 2026-10-10 (Test build)
+
+- Getting started now has a "Download test build (Windows)" button linking to GitHub Releases (0.1.0-alpha.1) and says the installer is not code-signed yet; the FAQ answer about releases is updated — Content

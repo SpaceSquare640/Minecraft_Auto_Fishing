@@ -61,7 +61,8 @@ window.LOCALES.en = {
   },
   start: {
     title: "Getting started",
-    text: "Downloads and setup instructions will appear here when the first version is released. Until then, join the community on Discord for updates and questions.",
+    text: "A test build for Windows is available on GitHub Releases, and setup steps are in the Docs. The installer is not code-signed yet, so Windows may show a warning. Join the community on Discord for updates and questions.",
+    download: "Download test build (Windows)",
     discord: "Join the community on Discord",
     cta: "Follow on GitHub"
   },
@@ -71,7 +72,7 @@ window.LOCALES.en = {
       mod: { q: "Is it a mod?", a: "No. It runs outside Minecraft and does not change any game files." },
       servers: { q: "Can I use it on multiplayer servers?", a: "Many servers do not allow automated or AFK fishing. Check the rules of the server you play on first." },
       official: { q: "Is it made by Mojang or Microsoft?", a: "No. This is an independent fan project and is not affiliated with Mojang or Microsoft." },
-      release: { q: "When will it be released?", a: "There is no release date yet. Progress is posted on the Changelog page." },
+      release: { q: "When will it be released?", a: "A first test build for Windows is available on GitHub Releases. Progress toward a stable release is posted on the Changelog page." },
       versions: { q: "Which Minecraft editions and platforms will it support?", a: "Minecraft: Java Edition on Windows, macOS and Linux, and Minecraft: Bedrock Edition on Windows. Consoles and mobile devices are not supported. Supported game versions will be listed in the docs at release." },
       free: { q: "Is it free?", a: "Yes. It is open source under the GPL-3.0 license." }
     }

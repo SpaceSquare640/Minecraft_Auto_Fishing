@@ -4,7 +4,7 @@ All notable changes to the Minecraft Auto Fishing tool are documented here.
 
 ## Unreleased
 
-- After you press F8, the app waits half a second before the first cast, so Bedrock Edition no longer misses it — 2026-10-10
+- Bedrock Edition: the first cast after you return to the game (for example after closing the pause menu with Esc) is no longer missed. Bedrock ignores the first mouse button event after its window gets the focus back, so the app first sends a mouse release that does nothing in the game; it also waits half a second after F8 (being tested) — 2026-10-10
 - The Windows installer shows the app icon instead of the default installer icon — 2026-10-10
 
 ## 0.1.0-alpha.1 — 2026-10-10 (test pre-release, Windows)

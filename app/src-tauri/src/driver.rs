@@ -3,6 +3,7 @@
 
 use std::sync::Arc;
 use std::sync::atomic::Ordering;
+use std::thread;
 use std::time::{Duration, Instant};
 
 use maf_detectors::subtitle::LineEvent;
@@ -10,7 +11,7 @@ use maf_detectors::{Bite, DetectorId};
 use maf_engine::{Action, Config, Engine, Event, State, Stats};
 use maf_game_profile::{BITE_KEY, JavaProfile, RETRIEVE_KEY, THROW_KEY, ocr_language_tag};
 use maf_platform_win::capture::Capture;
-use maf_platform_win::{Edition, GameWindow, find_game_window, right_click};
+use maf_platform_win::{Edition, GameWindow, find_game_window, release_right, right_click};
 use serde::Serialize;
 
 use crate::detect::{self, Plan};
@@ -21,6 +22,9 @@ pub type SharedLog = Arc<std::sync::Mutex<EventLog>>;
 /// How often to look for the game window while none is known.
 const FIND_INTERVAL: Duration = Duration::from_secs(1);
 
+/// Pause between the lone release sent after a focus change and the real click.
+const PRIME_GAP: Duration = Duration::from_millis(50);
+
 /// Timeouts in a row without a bite before the app suggests checking the subtitle setup.
 const NO_BITE_HINT_AFTER: u32 = 2;
 
@@ -30,6 +34,8 @@ pub struct Driver {
     game: Option<GameWindow>,
     capture: Option<Capture>,
     focused: bool,
+    /// A click reached the game since its window last got the focus.
+    primed: bool,
     last_find: Option<Instant>,
     fps: Option<f32>,
     fps_mark: (Instant, u64),
@@ -84,6 +90,7 @@ impl Driver {
             game: None,
             capture: None,
             focused: false,
+            primed: false,
             last_find: None,
             fps: None,
             fps_mark: (now, 0),
@@ -152,6 +159,7 @@ impl Driver {
         let focused = self.game.as_ref().is_some_and(GameWindow::is_foreground);
         if focused != self.focused {
             self.focused = focused;
+            self.primed = false;
             self.feed(if focused {
                 Event::FocusGained
             } else {
@@ -243,12 +251,28 @@ impl Driver {
     }
 
     fn click(&mut self, now: Duration) {
+        let mut primed_now = false;
         let result = match &self.game {
-            Some(game) => right_click(game).map_err(|e| e.to_string()),
+            Some(game) => {
+                if !self.primed {
+                    // Bedrock drops the first mouse button event after its window gets the
+                    // focus back, e.g. after the pause menu was closed with Esc. Give it a
+                    // lone release (no game action) to drop instead of the real click.
+                    primed_now = release_right(game).is_ok();
+                    thread::sleep(PRIME_GAP);
+                }
+                right_click(game).map_err(|e| e.to_string())
+            }
             None => Err("Minecraft window not found".to_owned()),
         };
+        if primed_now {
+            self.log("Sent a mouse release before the first click since the game got focus");
+        }
         match result {
-            Ok(()) => self.last_error = None,
+            Ok(()) => {
+                self.primed = true;
+                self.last_error = None;
+            }
             Err(message) => {
                 self.log(format!("Right click not sent: {message}"));
                 self.last_error = Some(message);

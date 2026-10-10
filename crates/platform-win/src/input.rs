@@ -48,6 +48,16 @@ pub fn right_click(game: &GameWindow) -> Result<(), InputError> {
     send(MOUSEEVENTF_RIGHTUP)
 }
 
+/// Sends only a right-button release, only if `game` is in the foreground. Using an item
+/// happens on press, so a lone release does nothing in the game. Bedrock drops the first mouse
+/// button event after its window gets the focus back; this release is meant to be that event.
+pub fn release_right(game: &GameWindow) -> Result<(), InputError> {
+    if !game.is_foreground() {
+        return Err(InputError::NotForeground);
+    }
+    send(MOUSEEVENTF_RIGHTUP)
+}
+
 fn send(flags: MOUSE_EVENT_FLAGS) -> Result<(), InputError> {
     let inputs = [mouse(flags)];
     // SAFETY: `inputs` is a valid slice and cbsize is the size of one INPUT, as required.

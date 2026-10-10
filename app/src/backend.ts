@@ -23,6 +23,8 @@ export interface Status {
     lastBiteSource: string | null;
     lastBiteSecondsAgo: number | null;
   };
+  /** The bite subtitle was not seen for several waits in a row. */
+  noBiteHint: boolean;
 }
 
 export interface Settings {

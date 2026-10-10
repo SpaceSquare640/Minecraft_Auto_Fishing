@@ -73,13 +73,18 @@ function render(s: Status): void {
   el("fps").textContent = s.captureFps === null ? "-" : `${Math.round(s.captureFps)} fps`;
   const d = s.detection;
   el("detection").textContent = d.methods.length
-    ? d.methods.join(" + ") + (d.ocrLanguage ? ` (${t("fishing.ocr", { lang: d.ocrLanguage })})` : "")
+    ? d.methods
+        .map((m) => (m === "subtitles" ? t("fishing.lookSubtitle") + (d.ocrLanguage ? ` (${t("fishing.ocr", { lang: d.ocrLanguage })})` : "") : t("fishing.lookPack")))
+        .join(t("fishing.or"))
     : "-";
   el("last-bite").textContent =
     d.lastBiteSecondsAgo === null ? "-" : t("fishing.secondsAgo", { n: Math.round(d.lastBiteSecondsAgo), source: d.lastBiteSource ?? "" });
   const error = el("error");
   error.textContent = s.lastError ?? "";
   error.hidden = !s.lastError;
+  const noBite = el("no-bite");
+  noBite.textContent = s.noBiteHint && s.game ? t(`noBite.${s.game.edition}`) : "";
+  noBite.hidden = !noBite.textContent;
 }
 
 async function refresh(): Promise<void> {

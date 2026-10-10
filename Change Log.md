@@ -11,4 +11,5 @@ No releases yet — the tool is in development.
   - F8 starts and stops fishing; the app pauses when Minecraft is not the active window.
   - Setup tab installs the Bite Caption resource pack for Java or Bedrock.
   - Optional log files (off by default, kept 7 days) and an update check at startup (can be turned off).
+  - If no bite subtitle shows up for several waits in a row, the app suggests what to check (pack, subtitles, casting distance).
 - Licensed under GPL-3.0 (`LICENSE` added) — 2026-10-08

@@ -68,6 +68,7 @@ export function demoBackend(): Backend {
       lastBiteSource: lastBite === null ? null : "subtitles",
       lastBiteSecondsAgo: lastBite === null ? null : (Date.now() - lastBite) / 1000,
     },
+    noBiteHint: false,
   });
 
   add("App Preview started");

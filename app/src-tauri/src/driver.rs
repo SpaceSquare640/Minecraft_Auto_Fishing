@@ -7,7 +7,7 @@ use std::time::{Duration, Instant};
 
 use maf_detectors::subtitle::LineEvent;
 use maf_detectors::{Bite, DetectorId};
-use maf_engine::{Action, Config, Engine, Event, State};
+use maf_engine::{Action, Config, Engine, Event, State, Stats};
 use maf_game_profile::{BITE_KEY, JavaProfile, RETRIEVE_KEY, THROW_KEY, ocr_language_tag};
 use maf_platform_win::capture::Capture;
 use maf_platform_win::{Edition, GameWindow, find_game_window, right_click};
@@ -20,6 +20,9 @@ pub type SharedLog = Arc<std::sync::Mutex<EventLog>>;
 
 /// How often to look for the game window while none is known.
 const FIND_INTERVAL: Duration = Duration::from_secs(1);
+
+/// Timeouts in a row without a bite before the app suggests checking the subtitle setup.
+const NO_BITE_HINT_AFTER: u32 = 2;
 
 pub struct Driver {
     engine: Engine,
@@ -34,6 +37,7 @@ pub struct Driver {
     last_error: Option<String>,
     detection: Arc<detect::Shared>,
     last_bite: Option<(DetectorId, Instant)>,
+    no_bite: NoBiteWatch,
     log: SharedLog,
 }
 
@@ -51,6 +55,8 @@ pub struct Status {
     hotkey: Option<&'static str>,
     last_error: Option<String>,
     detection: DetectionInfo,
+    /// The bite subtitle was not seen for several waits in a row.
+    no_bite_hint: bool,
 }
 
 #[derive(Serialize)]
@@ -85,6 +91,7 @@ impl Driver {
             last_error: None,
             detection,
             last_bite: None,
+            no_bite: NoBiteWatch::default(),
             log,
         }
     }
@@ -197,6 +204,7 @@ impl Driver {
                 }),
                 last_bite_seconds_ago: self.last_bite.map(|(_, at)| at.elapsed().as_secs_f32()),
             },
+            no_bite_hint: self.no_bite.showing(),
         }
     }
 
@@ -206,14 +214,17 @@ impl Driver {
 
     fn feed(&mut self, event: Event) {
         let now = self.now();
-        let (before, resyncs) = (self.engine.state(), self.engine.stats().resyncs);
+        let (before, stats) = (self.engine.state(), self.engine.stats());
         for action in self.engine.step(event, now) {
             match action {
                 Action::RightClick => self.click(now),
             }
         }
         let after = self.engine.state();
-        if self.engine.stats().resyncs > resyncs {
+        if self.no_bite.observe(event, stats, self.engine.stats()) {
+            self.log("No bite subtitle seen in the last waits: check the subtitle setup");
+        }
+        if self.engine.stats().resyncs > stats.resyncs {
             self.log("Bobber state corrected to match the game");
         }
         if after != before {
@@ -334,6 +345,29 @@ fn plan_for(edition: Edition) -> Plan {
     }
 }
 
+/// Counts waits that ended without a bite. Several in a row usually means the game shows no
+/// bite subtitle (pack off, subtitles off or the bobber too far away).
+#[derive(Default)]
+struct NoBiteWatch {
+    streak: u32,
+}
+
+impl NoBiteWatch {
+    /// Returns true when the hint starts showing.
+    fn observe(&mut self, event: Event, before: Stats, after: Stats) -> bool {
+        if event == Event::Start || after.bites > before.bites {
+            self.streak = 0;
+            return false;
+        }
+        let was = self.showing();
+        self.streak += after.timeouts - before.timeouts;
+        !was && self.showing()
+    }
+
+    fn showing(&self) -> bool {
+        self.streak >= NO_BITE_HINT_AFTER
+    }
+}
 fn state_name(state: State) -> &'static str {
     match state {
         State::Idle => "idle",
@@ -341,5 +375,53 @@ fn state_name(state: State) -> &'static str {
         State::Waiting => "waiting",
         State::Reeling => "reeling",
         State::Paused => "paused",
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn stats(bites: u32, timeouts: u32) -> Stats {
+        Stats {
+            bites,
+            timeouts,
+            ..Stats::default()
+        }
+    }
+
+    #[test]
+    fn hint_after_two_timeouts_in_a_row() {
+        let mut watch = NoBiteWatch::default();
+        assert!(!watch.observe(Event::Tick, stats(0, 0), stats(0, 1)));
+        assert!(!watch.showing());
+        assert!(watch.observe(Event::Tick, stats(0, 1), stats(0, 2)));
+        assert!(watch.showing());
+        // Reported once, but keeps showing.
+        assert!(!watch.observe(Event::Tick, stats(0, 2), stats(0, 3)));
+        assert!(watch.showing());
+    }
+
+    #[test]
+    fn bite_or_start_clears_the_hint() {
+        let mut watch = NoBiteWatch::default();
+        watch.observe(Event::Tick, stats(0, 0), stats(0, 2));
+        assert!(watch.showing());
+        watch.observe(Event::Bite, stats(0, 2), stats(1, 2));
+        assert!(!watch.showing());
+
+        watch.observe(Event::Tick, stats(1, 2), stats(1, 4));
+        assert!(watch.showing());
+        watch.observe(Event::Start, stats(1, 4), stats(1, 4));
+        assert!(!watch.showing());
+    }
+
+    #[test]
+    fn a_bite_between_timeouts_restarts_the_count() {
+        let mut watch = NoBiteWatch::default();
+        watch.observe(Event::Tick, stats(0, 0), stats(0, 1));
+        watch.observe(Event::Bite, stats(0, 1), stats(1, 1));
+        watch.observe(Event::Tick, stats(1, 1), stats(1, 2));
+        assert!(!watch.showing());
     }
 }

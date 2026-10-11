@@ -1,5 +1,6 @@
 # Release: pushing a version tag (v1.2.3) builds the Windows installers on GitHub's runners and
-# creates a draft release with build provenance. The maintainer checks the draft and publishes it.
+# creates a draft release with build provenance. Release files: the two installers, one zip with
+# both resource packs, and SHA256SUMS.txt. The maintainer checks the draft and publishes it.
 #
 # Security rules (CLAUDE.md §9.2): permissions per job, GitHub-owned actions pinned to full SHAs,
 # no credentials persisted, no secrets, no caches. Packages are installed only from the lockfiles
@@ -82,7 +83,6 @@ jobs:
 
           bedrock = pack("resource-packs/bedrock/AMF_Bite_Caption")
           java = pack("resource-packs/java/AMF_Bite_Caption")
-          open(f"dist/{base}_bedrock.mcpack", "wb").write(bedrock)
           readme = (
               "Minecraft Auto Fishing - Bite Caption resource packs\r\n\r\n"
               "They give the fishing bite its own subtitle, [AMF] BITE, and change nothing else.\r\n"

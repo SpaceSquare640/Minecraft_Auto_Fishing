@@ -2,6 +2,10 @@
 
 All notable changes to the Minecraft Auto Fishing tool are documented here.
 
+## Unreleased
+
+- Releases ship the resource packs in one zip (`resource-packs.zip`, Bedrock and Java) instead of a separate Bedrock `.mcpack` download; the app can still install them from its Setup tab — 2026-10-11
+
 ## 1.0.0 — 2026-10-11 (Windows)
 
 First release of the Windows app. Download it from [GitHub Releases](https://github.com/SpaceSquare640/Minecraft_Auto_Fishing/releases/latest). macOS and Linux are not supported yet. The installer is not code-signed yet, so Windows SmartScreen or Microsoft Defender may warn you.

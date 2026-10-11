@@ -32,6 +32,17 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Check that the tag matches the app version
+        shell: python
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          import json, os, sys
+          version = os.environ["TAG"].removeprefix("v")
+          app_version = json.load(open("app/src-tauri/tauri.conf.json", encoding="utf-8"))["version"]
+          if version != app_version:
+              sys.exit(f"tag {version} does not match the app version {app_version}")
+
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
@@ -51,11 +62,8 @@ jobs:
         env:
           TAG: ${{ github.ref_name }}
         run: |
-          import glob, hashlib, io, json, os, shutil, sys, zipfile
-          version = os.environ["TAG"].removeprefix("v")
-          app_version = json.load(open("app/src-tauri/tauri.conf.json", encoding="utf-8"))["version"]
-          if version != app_version:
-              sys.exit(f"tag {version} does not match the app version {app_version}")
+          import glob, hashlib, io, os, shutil, zipfile
+          version = os.environ["TAG"].removeprefix("v")  # checked against the app version above
           base = f"Minecraft-Auto-Fishing_{version}"
           os.makedirs("dist")
           [setup] = glob.glob("target/release/bundle/nsis/*-setup.exe")

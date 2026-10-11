@@ -7,7 +7,7 @@ window.LOCALES.en = {
     docsTitle: "Docs · Minecraft Auto Fishing",
     changelogTitle: "Changelog · Minecraft Auto Fishing",
     notFoundTitle: "Page not found · Minecraft Auto Fishing",
-    description: "An open-source auto-fishing tool in development for Minecraft: Java Edition (Windows, macOS, Linux) and Bedrock Edition (Windows). It runs outside the game and is not a mod."
+    description: "An open-source auto-fishing tool for Minecraft: Java Edition and Bedrock Edition on Windows (macOS and Linux are not supported yet). It runs outside the game and is not a mod."
   },
   nav: {
     label: "Main",
@@ -55,7 +55,7 @@ window.LOCALES.en = {
     items: {
       reel: { title: "Auto reel-in", text: "Reels in the moment a fish bites." },
       recast: { title: "Auto recast", text: "Casts again after every catch, with no input from you." },
-      outside: { title: "Runs outside the game", text: "Not a mod, so no game files are changed. For Java Edition (Windows, macOS, Linux) and Bedrock Edition (Windows)." },
+      outside: { title: "Runs outside the game", text: "Not a mod, so no game files are changed. For Java Edition and Bedrock Edition on Windows; macOS and Linux are not supported yet." },
       open: { title: "Open source", text: "Free to read, change and share under GPL-3.0." }
     }
   },
@@ -67,8 +67,8 @@ window.LOCALES.en = {
   },
   start: {
     title: "Getting started",
-    text: "A test build for Windows is available on GitHub Releases, and setup steps are in the Docs. The installer is not code-signed yet, so Windows may show a warning. Join the community on Discord for updates and questions.",
-    download: "Download test build (Windows)",
+    text: "Version 1.0.0 for Windows is available on GitHub Releases, and setup steps are in the Docs. macOS and Linux are not supported yet. The installer is not code-signed yet, so Windows may show a warning. Join the community on Discord for updates and questions.",
+    download: "Download for Windows",
     discord: "Join the community on Discord",
     cta: "Follow on GitHub"
   },
@@ -78,8 +78,8 @@ window.LOCALES.en = {
       mod: { q: "Is it a mod?", a: "No. It runs outside Minecraft and does not change any game files." },
       servers: { q: "Can I use it on multiplayer servers?", a: "Many servers do not allow automated or AFK fishing. Check the rules of the server you play on first." },
       official: { q: "Is it made by Mojang or Microsoft?", a: "No. This is an independent fan project and is not affiliated with Mojang or Microsoft." },
-      release: { q: "When will it be released?", a: "A first test build for Windows is available on GitHub Releases. Progress toward a stable release is posted on the Changelog page." },
-      versions: { q: "Which Minecraft editions and platforms will it support?", a: "Minecraft: Java Edition on Windows, macOS and Linux, and Minecraft: Bedrock Edition on Windows. Consoles and mobile devices are not supported. Supported game versions will be listed in the docs at release." },
+      release: { q: "Is it released?", a: "Yes. Version 1.0.0 for Windows is on GitHub Releases. macOS and Linux are not supported yet; progress is posted on the Changelog page." },
+      versions: { q: "Which Minecraft editions and platforms are supported?", a: "Minecraft: Java Edition and Bedrock Edition on Windows 10 / 11. macOS and Linux are not supported yet. Consoles and mobile devices are not supported. Tested with Java Edition 26.3 and Bedrock Edition (October 2026)." },
       free: { q: "Is it free?", a: "Yes. It is open source under the GPL-3.0 license." }
     }
   },
@@ -97,10 +97,10 @@ window.LOCALES.en = {
     newTab: "(opens in a new tab)"
   },
   hero: {
-    status: "In development",
+    status: "1.0.0 for Windows",
     title: "Minecraft Auto Fishing",
     tagline: "Stop staring at the bobber.",
-    description: "An open-source tool, currently in development, that will watch for a bite, reel in and recast for you in Minecraft: Java Edition and Bedrock Edition on PC. It runs outside the game and is not a mod.",
+    description: "An open-source tool that watches for a bite, reels in and recasts for you in Minecraft: Java Edition and Bedrock Edition on Windows. It runs outside the game and is not a mod.",
     ctaDemo: "Try the demo",
     ctaGithub: "View on GitHub",
     ctaDiscord: "Join Discord",

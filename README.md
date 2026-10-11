@@ -142,6 +142,7 @@ Other automation:
 |---|---|---|
 | CodeQL (JavaScript + GitHub Actions) | `codeql.yml` on this branch | every push / PR |
 | Weekly health check (live site, external links, Discord invite) | `.github/workflows/health.yml` on `Source_Code` — runs this branch's `smoke-test.js health` | Mondays 01:17 UTC, or manually |
+| Release (Windows installers, resource packs, SHA256SUMS, build provenance → draft release) | `.github/workflows/release.yml` on `Source_Code` | pushing a `v*` tag |
 | Dependabot (keeps pinned action SHAs current on both branches) | `.github/dependabot.yml` on `Source_Code` | weekly, 7-day cooldown, opens PRs only |
 
 Scheduled workflows and the Dependabot config must live on the default branch (`Source_Code`); GitHub ignores them elsewhere.
@@ -150,8 +151,9 @@ Security rules for the workflow:
 
 - `permissions: {}` by default; each job opts into the minimum it needs.
 - Only GitHub-owned actions, pinned to full commit SHAs (tag in the trailing comment).
-- `persist-credentials: false`; no `pull_request_target`; no secrets; no package installs;
-  no untrusted `${{ }}` expressions inside `run:`.
+- `persist-credentials: false`; no `pull_request_target`; no secrets; no package installs
+  (exception: `release.yml` installs only from the lockfiles, `npm ci --ignore-scripts` and
+  `cargo --locked`, in a read-only build job); no untrusted `${{ }}` expressions inside `run:`.
 - Before changing the workflow, run `actionlint` and `zizmor --persona=pedantic` (both online
   and `--offline`); all must report zero findings.
 ## Adding a language

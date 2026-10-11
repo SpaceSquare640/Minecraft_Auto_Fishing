@@ -7,7 +7,7 @@
 <h1 align="center">Minecraft Auto Fishing</h1>
 
 <p align="center">
-  An open-source tool, currently in development, that will watch for a bite, reel in and recast for you in Minecraft.<br>
+  An open-source tool that watches for a bite, reels in and recasts for you in Minecraft.<br>
   It runs outside the game — it is not a mod.
 </p>
 
@@ -17,7 +17,7 @@
 
 ---
 
-**Status:** In development — a test pre-release for Windows is on [GitHub Releases](https://github.com/SpaceSquare640/Minecraft_Auto_Fishing/releases).
+**Status:** 1.0.0 for Windows is on [GitHub Releases](https://github.com/SpaceSquare640/Minecraft_Auto_Fishing/releases/latest). macOS and Linux are not supported yet.
 
 | | |
 |---|---|

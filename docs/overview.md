@@ -1,19 +1,19 @@
 # Overview
 
-Minecraft Auto Fishing is an open-source tool that will automate the repetitive part of fishing in Minecraft: watching the bobber, reeling in at the right moment and casting again.
+Minecraft Auto Fishing is an open-source tool that automates the repetitive part of fishing in Minecraft: watching the bobber, reeling in at the right moment and casting again.
 
-> **Status:** In development. A test pre-release for Windows is on [GitHub Releases](https://github.com/SpaceSquare640/Minecraft_Auto_Fishing/releases); behavior may still change.
+> **Status:** Version 1.0.0 for Windows is on [GitHub Releases](https://github.com/SpaceSquare640/Minecraft_Auto_Fishing/releases/latest). macOS and Linux are not supported yet.
 
 ## Supported platforms
 
 | Edition | Platforms |
 |---|---|
-| Minecraft: Java Edition | Windows, macOS, Linux |
+| Minecraft: Java Edition | Windows 10 / 11 (macOS and Linux are planned, not supported yet) |
 | Minecraft: Bedrock Edition | Windows 10 / 11 |
 
-Consoles (Xbox, PlayStation, Nintendo Switch) and mobile devices (iOS, Android) are not supported. Supported game versions will be listed here at release.
+Consoles (Xbox, PlayStation, Nintendo Switch) and mobile devices (iOS, Android) are not supported. Tested with Minecraft: Java Edition 26.3 and Bedrock Edition for Windows (October 2026).
 
-## How it will work
+## How it works
 
 1. **Start** — hold a fishing rod, face the water and press **F8** in the game (or **Start** in the app).
 2. **Cast** — the tool casts the fishing rod.

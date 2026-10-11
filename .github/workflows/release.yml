@@ -1,0 +1,135 @@
+# Release: pushing a version tag (v1.2.3) builds the Windows installers on GitHub's runners and
+# creates a draft release with build provenance. The maintainer checks the draft and publishes it.
+#
+# Security rules (CLAUDE.md §9.2): permissions per job, GitHub-owned actions pinned to full SHAs,
+# no credentials persisted, no secrets, no caches. Packages are installed only from the lockfiles
+# (npm ci --ignore-scripts, cargo --locked); the build job has read-only access and the release
+# job, which can write, runs none of the project's code.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions: {}
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build Windows installers
+    runs-on: windows-2025
+    timeout-minutes: 60
+    permissions:
+      contents: read # check out the tagged source
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24.19.0"
+          package-manager-cache: false
+
+      - name: Install front-end packages (lockfile only, no install scripts)
+        working-directory: app
+        run: npm ci --ignore-scripts
+
+      - name: Build the installers (Rust toolchain from rust-toolchain.toml, Cargo.lock only)
+        working-directory: app
+        run: npm run tauri -- build --bundles nsis,msi -- --locked
+
+      - name: Collect the release files
+        shell: python
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          import glob, hashlib, io, json, os, shutil, sys, zipfile
+          version = os.environ["TAG"].removeprefix("v")
+          app_version = json.load(open("app/src-tauri/tauri.conf.json", encoding="utf-8"))["version"]
+          if version != app_version:
+              sys.exit(f"tag {version} does not match the app version {app_version}")
+          base = f"Minecraft-Auto-Fishing_{version}"
+          os.makedirs("dist")
+          [setup] = glob.glob("target/release/bundle/nsis/*-setup.exe")
+          [msi] = glob.glob("target/release/bundle/msi/*.msi")
+          shutil.copy(setup, f"dist/{base}_x64-setup.exe")
+          shutil.copy(msi, f"dist/{base}_x64_en-US.msi")
+
+          def pack(folder):
+              buf = io.BytesIO()
+              with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+                  for root, _, files in sorted(os.walk(folder)):
+                      for name in sorted(files):
+                          path = os.path.join(root, name)
+                          z.write(path, os.path.relpath(path, folder).replace(os.sep, "/"))
+              return buf.getvalue()
+
+          bedrock = pack("resource-packs/bedrock/AMF_Bite_Caption")
+          java = pack("resource-packs/java/AMF_Bite_Caption")
+          open(f"dist/{base}_bedrock.mcpack", "wb").write(bedrock)
+          readme = (
+              "Minecraft Auto Fishing - Bite Caption resource packs\r\n\r\n"
+              "They give the fishing bite its own subtitle, [AMF] BITE, and change nothing else.\r\n"
+              "The app can install them for you (Setup tab).\r\n\r\n"
+              "Bedrock: double-click bedrock/AMF_Bite_Caption.mcpack, activate it in Settings > Global Resources, turn on captions.\r\n"
+              "Java (optional): copy java/AMF_Bite_Caption.zip into .minecraft/resourcepacks and select it in Options > Resource Packs.\r\n\r\n"
+              "License: GPL-3.0. Not affiliated with Mojang or Microsoft.\r\n"
+          )
+          with zipfile.ZipFile(f"dist/{base}_resource-packs.zip", "w", zipfile.ZIP_DEFLATED) as z:
+              z.writestr("bedrock/AMF_Bite_Caption.mcpack", bedrock)
+              z.writestr("java/AMF_Bite_Caption.zip", java)
+              z.writestr("README.txt", readme)
+
+          with open("dist/SHA256SUMS.txt", "w", newline="\n") as sums:
+              for name in sorted(os.listdir("dist")):
+                  if name != "SHA256SUMS.txt":
+                      digest = hashlib.sha256(open(f"dist/{name}", "rb").read()).hexdigest()
+                      sums.write(f"{digest}  {name}\n")
+          print(open("dist/SHA256SUMS.txt").read())
+
+      - name: Upload the release files
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-files
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    name: Draft release with build provenance
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write # create the draft release
+      id-token: write # sign the build provenance
+      attestations: write # store the build provenance
+    steps:
+      - name: Download the release files
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release-files
+          path: dist
+
+      - name: Build provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: dist/*
+
+      - name: Create the draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
+        run: >-
+          gh release create "$TAG" dist/* --repo "$REPO" --draft --verify-tag
+          --title "Minecraft Auto Fishing ${TAG#v}"
+          --notes "Changes: https://github.com/$REPO/blob/Source_Code/Change%20Log.md"

@@ -124,3 +124,7 @@ All notable changes to the website branch are recorded here.
 - Home page, feature cards, FAQ and page description say version 1.0.0 is out for Windows and that macOS and Linux are not supported yet; the download button points to the latest release — Content
 - App Preview updated to the 1.0.0 app (adds the game menu hint) — Content
 - Added `.github/workflows/release.yml` on `Source_Code`: pushing a `v*` tag builds the Windows installers on GitHub's runners, packs the resource packs, writes SHA256SUMS, adds build provenance and creates a draft release. The build job is read-only and installs only from the lockfiles — CI/CD
+
+## 2026-10-11 (Release files)
+
+- `release.yml` on `Source_Code` ships the resource packs in one zip only (no separate Bedrock `.mcpack`) — CI/CD

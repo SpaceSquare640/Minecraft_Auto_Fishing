@@ -4,8 +4,10 @@ All notable changes to the Minecraft Auto Fishing tool are documented here.
 
 ## Unreleased
 
-- The Bite Caption resource pack now supports Minecraft: Java Edition 1.21 and later, and Bedrock Edition 1.21 and later — 2026-10-17
-- Releases ship the resource packs in one zip (`resource-packs.zip`, Bedrock and Java) instead of a separate Bedrock `.mcpack` download; the app can still install them from its Setup tab — 2026-10-11
+## 1.0.1 — 2026-10-17 (Windows)
+
+- The Bite Caption resource pack now supports Minecraft: Java Edition 1.21 and later, and Bedrock Edition 1.21 and later.
+- Releases ship the resource packs in one zip (`resource-packs.zip`, Bedrock and Java) instead of a separate Bedrock `.mcpack` download; the app can still install them from its Setup tab.
 
 ## 1.0.0 — 2026-10-11 (Windows)
 

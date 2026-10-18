@@ -132,3 +132,7 @@ All notable changes to the website branch are recorded here.
 ## 2026-10-18 (Scheduled source checks)
 
 - Added scheduled workflows on `Source_Code` for weekly Rust formatting, linting, tests, and app UI builds, and for a monthly read-only Cargo/npm dependency update report in the Actions job summary — CI/CD
+
+## 2026-10-18 (Release draft notes)
+
+- Updated `Source_Code`'s release workflow to generate complete draft Release notes from the version tag and verified asset list, including support, downloads, setup, known issues, provenance verification, and the change log link — CI/CD

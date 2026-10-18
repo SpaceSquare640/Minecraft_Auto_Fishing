@@ -128,3 +128,7 @@ All notable changes to the website branch are recorded here.
 ## 2026-10-11 (Release files)
 
 - `release.yml` on `Source_Code` ships the resource packs in one zip only (no separate Bedrock `.mcpack`) — CI/CD
+
+## 2026-10-18 (Scheduled source checks)
+
+- Added scheduled workflows on `Source_Code` for weekly Rust formatting, linting, tests, and app UI builds, and for a monthly read-only Cargo/npm dependency update report in the Actions job summary — CI/CD

@@ -1,0 +1,50 @@
+# Validate proposed Source_Code changes on GitHub-hosted Windows runners.
+name: Source PR checks
+
+on:
+  pull_request:
+    branches:
+      - Source_Code
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions: {}
+
+concurrency:
+  group: source-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Format, lint, test, and app build
+    runs-on: windows-2025
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - name: Check out pull request
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check Rust formatting
+        run: cargo fmt --all -- --check
+
+      - name: Lint Rust workspace
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+
+      - name: Test Rust workspace
+        run: cargo test --workspace --locked
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24.19.0"
+          package-manager-cache: false
+
+      - name: Install app packages from lockfile
+        working-directory: app
+        run: npm ci --ignore-scripts
+
+      - name: Build app UI
+        working-directory: app
+        run: npm run build

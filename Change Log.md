@@ -136,3 +136,7 @@ All notable changes to the website branch are recorded here.
 ## 2026-10-18 (Release draft notes)
 
 - Updated `Source_Code`'s release workflow to generate complete draft Release notes from the version tag and verified asset list, including support, downloads, setup, known issues, provenance verification, and the change log link — CI/CD
+
+## 2026-10-20 (Source PR checks)
+
+- Added a pull request workflow on `Source_Code` to run Rust formatting, Clippy, tests and the app UI build on GitHub-hosted Windows runners — CI/CD

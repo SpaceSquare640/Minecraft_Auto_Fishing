@@ -6,6 +6,12 @@ on:
     branches:
       - Source_Code
     types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Open pull request number targeting Source_Code
+        required: true
+        type: number
 
 permissions: {}
 
@@ -15,15 +21,43 @@ concurrency:
 
 jobs:
   check:
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/Source_Code'
     name: Format, lint, test, and app build
     runs-on: windows-2025
     timeout-minutes: 45
     permissions:
       contents: read
+      pull-requests: read # validate the selected PR's state and base branch for manual runs
     steps:
+      - name: Validate manually selected pull request
+        if: github.event_name == 'workflow_dispatch'
+        shell: python
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          REPO: ${{ github.repository }}
+        run: |
+          import json, os, sys, urllib.request
+
+          number = os.environ["PR_NUMBER"]
+          if not number.isdecimal():
+              sys.exit("PR number must be a positive integer")
+          request = urllib.request.Request(
+              f"https://api.github.com/repos/{os.environ['REPO']}/pulls/{number}",
+              headers={
+                  "Accept": "application/vnd.github+json",
+                  "Authorization": f"Bearer {os.environ['GH_TOKEN']}",
+              },
+          )
+          with urllib.request.urlopen(request, timeout=20) as response:
+              pull_request = json.load(response)
+          if pull_request["state"] != "open" or pull_request["base"]["ref"] != "Source_Code":
+              sys.exit("Selected pull request must be open and target Source_Code")
+
       - name: Check out pull request
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ github.event.pull_request.merge_commit_sha || format('refs/pull/{0}/merge', inputs.pr_number) }}
           persist-credentials: false
 
       - name: Check Rust formatting
